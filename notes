@@ -1,0 +1,82 @@
+1. Download from untrusted PPA (Personal Package Archive) from launchpad.net, example
+sudo add-apt-repository ppa:danielrichter2007/grub-customizer
+sudo apt-get update 
+sudo apt-get install grub-customizer
+2. To list all installed packges
+dpkg --list
+3. To check amount of disk space
+df -h
+4. To uninstall
+sudo apt-get --purge remove octave3.2
+sudo apt-get --purge autoremove (to remove obsolete dependencies)
+OR straight:
+sudo apt-get --purge autoremove *software name*
+5. To clear PPA source *cfg* list such that the same software no overlaps
+sudo rm /etc/apt/sources.list.d/*list*
+sudo rm /etc/apt/trusted.gpg.d/*gpg*
+6. How to clone from Git Hub
+git clone https://github.com/gmarik/Vundle.vim.git ~/.vim/bundle/Vundle.vim
+7. Ctrl + Z to suspend a running process in terminal
+fg to bring the process back
+8. To shorten the long working directory in bash:
+PS1='\u:\W\$ ' 
+9. To restart SSH
+service ssh restart
+10. service ssh status to check ssh status
+11. SSH passphrase: mycoconutmilk, heisdesmond (kali)
+12. to kill all ssh instances: pkill ssh
+13. In windows, open the cmd in "Administrator mode", to bypass the UAC
+in the search box, type cmd, and then CTRL + SHIFT + ENTER, will open the cmd in Administrator mode
+14. c_ulong is 8 bytes in 64 bit system but 4 bytes in 32 bit system
+15. By default, windows will block outgoing ICMP unreachable messages.
+Windows Firewall has a mechanism named Stealth mode, which helps prevent malicious users from discovering information about network computers and the services that they run.
+
+Stealth mode blocks outgoing ICMP unreachable and TCP reset messages for a port when no application is listening on that port.
+16. PCAP - packet capture (consists of API) for capturing network traffic
+17. Common mail ports
+	110 POP3
+	143 IMAP
+	25 SMTP
+18. All desktop shortcut is at /usr/share/applications
+19. systemctl --- is like a task manager
+20. services * status looks at /etc/init.d.*
+21. systemctl looks at /etc/init/*
+	- check here for autostart programs
+22. systemctl list-unit-files - to list all services in the computer. Seems like underlying service are being run by systemd in Debian.
+22. systemctl | grep running to grep running services
+22. netstat -ano to grep for all listening/non-listening ports (with processes pid)
+23. User pywin32 for developing python in Windows. It also contains all win OLE/COM API wrapper!
+24. You can invoke a built-in python module simple http server
+python -m SimpleHTTPServer 8000
+25. VIM replace
+s/foo/bar/g -- current line
+%s/foo/bar/g -- all lines
+26. To include service name for windows net start/stop to work
+first, execute *.exe* -install in a SYSTEM priviledged cmd
+27. In windows, for hung services, in cmd
+sc queryex *servicename*, get the PID
+taskkill /f /pid *pid*
+28. tasklist -v - to list all windows processes with pids
+29. Windows password: bluecornmoon
+30. Vim split
+Ctrl + P to open file to edit
+"Max out the height of the current split
+ctrl + w _
+
+"Max out the width of the current split
+ctrl + w |
+
+"Normalize all split sizes, which is very handy when resizing terminal
+ctrl + w =
+
+ctrl + w w to move around split
+31. node.js - npm - package manager
+32. sudo apt install ./***.deb files
+33. uname -r - check kernel version
+34. apt-cache search .. to search installable packages | apt-cache madison .. to check versions available to be installed
+35. du -hsx * | sort -rh | head -10  => search for top bulk files
+36. ssh-agent - Single Sign-On using SSH. The ssh-agent is a helper program that keeps track of user's identity keys and their passphrases. The agent can then use the keys to log into other servers without having the user type in a password or passphrase again
+To use:
+- eval "$(ssh-agent -s)"
+- ssh-add ~/.ssh/id_rsa
+

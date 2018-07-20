@@ -1,0 +1,18 @@
+How to setup Python in VIM (linux)
+
+Get latest VIM 8 with Python 2+:
+sudo add-apt-repository ppa:pi-rho/dev
+sudo apt-get update
+sudo apt-get install vim (+python/dyn)
+
+Install vim-nox for Python 3
+sudo apt-get install vim-nox (+python3/dyn)
+
+
+Update software packages using pip
+pip install --user --update **
+Make sure to include '--user' to install for only current user
+
+pip is by default pointing to pip3
+to install module for pip2.7, use pip2.7
+

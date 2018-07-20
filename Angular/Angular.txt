@@ -1,0 +1,765 @@
+
+Angular 2, 4 and 5 = Latest version of Angular
+
+
+app.module.ts <- to import modules (M)
+app.component.ts <- to declare components (with its selector)/ classes/ variables (C)
+app.component.html <- view (V) <- databinding [] () [()] are written here
+	- databinding - bind your data to DOM objects / react to user events
+
+app.module -> to bundle different components of the app
+app.components -> to build web pages
+
+in typescript: use `.. ` to write multi lines inline code.
+
+outside root (src) directory - .angular-cli.json -> configuration file, to define resources to import, can put my bootstrap css here
+
+the first code to get executed is main.ts. 
+app.module is the first module to be bootstrapped in main.ts. The bootstrap param in app.module is 'app.component'
+Inside app.component.ts, the components are further defined, i.e. selector (by default app-root), template and style
+The child component for app-root should be added in the app.component.html
+
+selectors: can select by
+1. element style -> selector:'app-servers' ..  html: <app-servers></app-servers> <-- by default
+2. attribute style -> selector:'[app-servers] .. html: '<div app-servers></div>
+3. class style -> selector:'.app-servers' .. html: <div class="app-servers"></div>
+
+@NgModule({
+...
+}) 
+is a decorator, a type script feature... when attached to a class, it will give the class some special feature (according to the information passed within..)
+when attached to a variable, like @Input somevariable, it will give the variable some special feature.. etc
+
+databinding: communication between typescript code and template (HTML)
+
+Typescript code (Business logic) ------ output data
+1. String interpolation ({{data}})
+2. Property Binding ([property]="data")    -- where data is a typescript expression, variable etc.. not string
+--------> Template (HTML)
+
+Template (HTML) ---------React to (user) events
+3. Event binding ((event)="expression")    -----> event here refers to all DOM events.. change, click, copy etc..
+----------->Typescript code(Business logic)
+
+	for HTML 'event' binding remove the 'on-' prefix, for eg (click)=".." instead of onclick
+	for event binding, can pass the dollar signed event as parameter ($event) into typescript method.. to get the details of the event
+	
+4. Two-Way-Binding [(ngModel)]="data"
+	need to import {FormsModule} from '@angular/forms'; in app.module to use
+	ngModel is a directive
+	the "data" can be updated from the model -> view and view -> model
+
+Property & Event Binding can be used on: 
+11. HTML Elements (Native properties & events) --> by default, example above
+22. Directives  (Custom properties & events)
+33. Components (Custom properties & events)
+
+33. Parent component cannot access child component's class variable, vice versa,
+but a special decorator @Input('..alias.. or can leave blank') in front of variable name i.e. @Input() hero:string; will make hero (as a property) available across components, so can bind the parent's "hero" to it
+[hero]="hero"
+
+Binding syntax whether event or properties: 
+
+left side is referring to THIS tag object = "right side is referring to expression or data or function($param) from the (business logic) TS file of this HTML file"
+
+Direction of binding:i.e how to interpret the "=" sign
+Unlike conventional language, the = sign direction is flexible, by default in terms of normal 11. HTML Elements cases, its from right assigned to left. For components' cross-binding, it depends on whether the left side tag object's has @Input() or @Output() defined in the component TS file. If @Output, its outgoing from left side to right, i.e. [serverCreated]="onServerCreated($param)", where param is emitted by EventEmitter serverCreated. If @Input, then its from right side to left, i.e. [hero]="hero"
+
+
+import { Input } from '@angular/core';
+
+@Input set filters(someparam) {
+	some function
+}
+
+This is like the setter function for javascript, assigning the variable will trigger the set function
+[filters]="someparam"
+
+
+Directives are instructions to the DOM. Component is a kind of directive (with template).
+Directives' selector is attribute style.
+
+*ngIf -> ngIf is a structural directive, it changes the structure of the DOM, so must add asterisk * in front
+<ng-template #somelabel></ng-template>
+<div *ngIf =""></div> 
+===was actually===
+<ng-template [ngIf]=""><div></div></ng-template>
+ng-template is not rendered and disposable
+--> the * star will transform (or called desugar) the syntax into ng-template
+
+[ngStyle]='{backgroundColor:getColor()}' - can bind ngStyle with some property values - allow to dynamically update HTML element styles
+[ngClass]='{cssClassName: *some javascript expression*}' - dynamically add/remove CSS classes
+*the curly brackets are needed on the right side above for ngStyle and ngClass coz its property binding.. hence right side must be an 'object'
+
+*ngFor - of -> Structural directive. It iterates through a list.
+*ngFor="let log of logs;index as i" .. then can use log or i within the same HTML element scope
+
+-----------
+#localReferences in HTML template
+
+local references can be placed in HTML tag to access the DOM object. Handy instead of binding/double-binding a temporary variable to a HTML property.
+
+Another way to access DOM object is #localReference in HTML + @ViewChild('localReference') in component TS file.
+But accessing via this way exposes the nativeElement and is not encouraged
+
+@ViewChild -> To access DOM elements inside view (template)
+@ContentChild -> To access <ng-content></ng-content> elements inside this view (template), where the actual content maybe at another (possibly parent's) template
+-----------
+child.component.html
+<ng-content></ng-content> <-- *said content* will still run here
+
+a hook for a parent template to project the *said content* code into a child template
+
+parent.component.html
+<app-*some selector*>
+	*said content*
+	
+</app-*some selector*>
+------------
+Use Renderer2 to access and update DOM elements
+
+https://angular.io/api/core/Renderer2
+
+@HostBinding('style.backgroundColor') backgroundColor: string = 'transparent';
+@HostListener('mouseenter') mouseenter(eventData: Event){
+    --> this.renderer.setStyle(this.elRef.nativeElement, 'background-color','pink');
+	or
+    --> this.backgroundColor = 'pink';
+}
+
+-----------
+getting services through Angular dependency injector -
+allow us to centralize (common) task, manage data
+@Component{
+ providers:[service class here]
+}
+
+*injected means defined in the providers array element 
+*Y need to be provided/injected? Coz Angular 2 will instantiate the service class for us
+hierachical injector -
+
+app.module (if a service class is injected here, the instance will be available application wide)
+   |
+   V
+app.component (if a service class is injected here, the instance will be available to all child,,etc)
+   |
+   |
+   |
+   |-> child1.component (if the SAME service class is injected again in a child component, it will overwrite the instace of the parent's component)
+   |
+   |-> child2.component
+
+@Injectable()
+If want to inject one service into another service, the another service class must have @Injectable() to receive the to be injected service as meta-data.
+Both services must be first injected in the provider[] of app.module level.
+Angular's DI (Dependency Injector) can only works with classes with meta-data, it doesn't work with plain vanila classes.
+
+----------
+
+this.array.slice() --> create by array copy, instead of referencing
+
+----------
+ROUTING =>
+
+Module:
+Routes (Type-alias) - To configure all the URLs properties (i.e. routes). An array of Route (s)
+Route - A single interface of Routes
+
+Template:
+routeLink (Directive) - To link to which route?  Knows which component template it is in, relative paths work.
+  ->queryParams (Bindable property) - ?something=somevalue&something2=somevalue2
+  ->fragment (Bindable property) - #somefragment -- only one fragment can be passed
+routeLinkActive (Directive) - To attach what class(es) to the current active routelink?
+  ->routeLinkActiveOptions (Bindable property) - Helper option to routeLinkActive. To be exact in routeLink?
+
+TS:
+Router (Class) - can navigate around in TS, but is always relative to the root (i.e. doesnt know which component it's in), relative paths dont work, unless passed in some NavigationExtras info.. like relativeTo which ActivatedRoute
+ActivatedRoute (Interface) - can be used in TS to traverse the router state tree
+Params (Type-alias) - Parameters that are passed in the route
+
+----------
+Redirection to Page not found, make sure the wildcard path configuration route is the last one in the array!
+
+...
+...
+{path: 'not-found', component: PageNotFoundComponent},
+{path: '**', redirectTo:'/not-found'}
+
+***BE VERY CAREFUL about the order of paths!
+
+const appRoutes: Routes=[
+  {path:'', component: HomeComponent},
+	...
+	...
+	...
+]
+
+This becomes especially important when the routing module is split up into even small modules and had to be imported.
+The order of importing these modules then becomes very important!
+
+Especially when there's lazy loading involved!
+
+The core module, which is the one that contains the root empty path link to home page and lazy loading links should be imported last (as compared to other sub-modules).
+AND MAKE SURE THAT THE LAZY FEATURE MODULE is not imported (AGAIN) in the app module! Coz the loadChildren is ALREADY loading it (the module).
+
+----------
+----------
+Route guards 
+
+CanActivate interface- guarding a route from being accessed freely
+
+can create a 'guard' class that implements CanActivate interface with the following method:
+
+export class AuthGuard implements CanActivate{
+  ....
+
+  canActivate(route: ActivatedRouteSnapshot,
+    state: RouterStateSnapshot): Observable<boolean> | Promise<boolean> | boolean{
+	...
+	...some function that return a promise with whether the condition is satisfied (true or false)
+  }
+}
+
+and hook it to one of the route:
+
+{path: 'servers', canActivate: [AuthGuard], component: ServersComponent}
+
+CanDeactivate interface- guarding a route from leaving freely
+
+CanDeactivate require a component <T> input, a target to deactivate
+
+interface CanDeactivate<T> { 
+  canDeactivate(component: T, currentRoute: ActivatedRouteSnapshot, currentState: RouterStateSnapshot, nextState?: RouterStateSnapshot): Observable<boolean> | Promise<boolean> | boolean
+}
+
+The component <T> can implement a method which tells canDeactivate, which need another interface to link these two callses OR the 'deactivate guard' class itself can implement the method itself
+
+Resolve interface:
+A resolver for async data that may take a while to load but doesnt block the route from loading first.
+
+-similar steps to implement like the above two guards
+
+-----------
+Due to the peculiar nature of SPA (Single Page Applications) that renders everything on one html page using javascript, the web server & browser need to support this feature when different routes (URLs) are being called at the browser
+
+1. HTML 5 Routing / History API (Path Location Strategy) - Using the history.pushState method in javascript, The browser creates new history entries that change the displayed URL without the need for a new request. Server side needs to be able to send back index.html when 404 (page not found) encountered. When redirect back to index.html, Angular will be able to handle the URL.
+2. Hash Location Strategy - Configuring Angular to add # in the URL, so that both web browser and server won't get triggered.
+
+---old legacy app which still needs to be handled manually
+
+example.com/admin.html <--- old app rendered in server
+
+example.com/admin/#/newreactcomponent <--- this is why need hash location strategy, so that the react component won't trigger the server. But admin.html still needs to be rendered by server.
+
+-----------
+
+OBSERVABLE =>
+
+- A 3rd party features (offered by rxjs) that allows for easy work with asynchronous task
+- Allow subscription to code that might or might not need to be executed depending on user's behaviour
+
+Observable
+- Stream of data sources like from User Events, HTTP Requests, Triggered in Code..
+
+--> Observer - code to handle the data, handle error or eventually handle completion
+Angular uses observable coz it doesnt re-render the whole component just because the parameter change again after OnInit
+
+- import 'rxjs/Rx' to unlock all rxjs operators!
+
+----- more info
+
+interface Observer<T> {
+  closed?: boolean;
+  next: (value: T) => void;
+  error: (err: any) => void;
+  complete: () => void;
+}
+
+An observable is created by invoking methods of Observer interface. Error and complete method will end the transmission.
+
+const myObservable = Observable.create((observer:Observer<string>) =>{
+	setTimeout(() =>{
+	observer.next('first package');
+	},2000);
+	setTimeout(() =>{
+	observer.next('second package');
+	},4000);
+	// setTimeout(() =>{
+	//   observer.error('error');
+	// },5000);
+	setTimeout(() =>{
+	observer.complete();
+	},6000);
+});
+
+
+--> Subscription is done by either implementing the Observer interface or totally overwriting with callback functions in place of its methods. Both of these have same effects.
+
+//totally overwriting Observer interface methods
+myObservable.subscribe(
+	(data: string) => {console.log(data);}, //callback method for 'next'
+	(error: string) => {console.log(error);}, //callback method for 'error'
+	() => {console.log('completed');} //for completion
+);
+
+
+//implementing the Observer interface
+const endObserver = {
+  next(value) {
+    console.log(value);
+  },
+  error(value) { 
+    console.log(value);
+  },        
+  complete() {
+    console.log('completed');
+  }
+};
+
+myObservable.subscribe(endObserver);
+
+****in the case of observables and promises console.log output, seems like the chrome dev tool will update the data as long as it's unseen.. 
+
+SomeObservable.subscribe(
+(data)->{
+ console.log(data) -> pre -- if i expand the data output fast enough, I could see it before it changes, else it would be only the image of *post 
+
+ *data changes
+
+ console.log(data) -> post
+}
+
+)
+
+**********Observables Operators & Syntax*******
+outer_observable.operator(
+	inner_observable..
+).operator(
+	even more inner_observable..	
+)...
+
+same as 
+
+outer_observable.pipe(
+	operator(inner_observable 1),
+	operator(even more inner_observable 2)...
+	...
+)
+
+
+**********Special*****
+map and switchmap
+plenty use cases when involved with NgRx.. retrieving state from reducers
+
+the projections/ changes done inside map or switchmap are synchronous..only afterwards, an observable (async object) is returned again.
+
+**********************
+
+----------
+
+Consider using Subject of rxjs to replace EventEmitter.
+Subject is both an Observer and Observable by itself. Coz it can handle error and complete.
+
+----------
+
+FORMS =>
+
+1. Template-Driven = Angular infers the Form Object from DOM
+-by default, needs FormsModule
+2. Reactive = Form is created programmatically (by developer) and synchronized with DOM
+-needs ReactiveFormsModule, to offer directives like FormGroup, FormGroupName, FormControl and FormControlName
+-can check in /@angular/forms/src/directives/reactive_directives/
+
+1. FormsModule - Angular infers and automatically create formGroup
+NgForm selector is automatically included in <form></form>, its instance can be accessed as 'ngFrom'
+this NgForm class contains all the details in JavaScript object of the form, it also has a ngSubmit EventEmitter
+that triggers when 'submit' type action is detected.
+
+<form #f="ngForm" (ngSubmit)="onSubmit(f)"></form>
+
+onSubmit is a user created method in component that will be called when ngSubmit triggered. f will contain the  
+'value' attribute, i.e. javascript objects of all the input fields that has ngModel (*with name="?") selector  on them. The name attributes are used as key, hence must be made available to ngModel.
+
+ngModel Creates a FormControl instance from a domain model and binds it to a form control element. ngModel can be used on all types of HTML element with user input (form control).
+
+4 ways of using ngModel:
+1. as just a selector <input name="???" ngModel></input>
+2. property bind an initial value <input name="???" [ngModel]="'???'"></input> or ngModel="???" where ??? is string*
+	-weird technique- 
+	[newmessage] = "message?null:message.content";
+	same as
+	[newmessage] = "message?.content";
+   ? is the safe navigation operator that is used on templates. It will stop evaluating when 'message' in this case is null or undefined, which usually happened if data, i.e 'message' is fetched async. 
+https://angular.io/guide/template-syntax#the-safe-navigation-operator----and-null-property-paths
+3. double bind a variable <input name="???" [(ngModel)]="???"></input>
+4. assign to a reference that can be used throughout the template or component <input name="???" #something="ngModel"></input>
+
+*don't confused between the below two
+ngModel="*some string*"
+#something="ngModel", where ngModel is a directive, BUT NOT STRING
+looks like its nothing to do with equal plus double quotation marks, but rather a reference is special
+
+use ngModelGroup to create subgroup of ngModel
+
+native HTML5 form validation can be recognized by Angular, for e.g. <input.... required email password etc..>
+if you don't want to supply custom error message for these validation, please put ngNativeValidate
+<form ngNativeValidate>
+    ... Your form code ...
+</form>
+to have native HTML5 validation message (and to stop submit action)
+
+
+2. ReactiveFormsModule - Developer creates their own formGroup in TS n pair to template
+
+FormGroup can be defined programmatically and tied to HTML template:
+
+    this.signupForm = new FormGroup({
+      'userData': new FormGroup({
+        'username' : new FormControl(null, Validators.required),
+        'email' : new FormControl(null,[Validators.required,Validators.email])
+      }
+      ),
+      'gender' : new FormControl('male'),
+      'hobbies' : new FormArray([])
+    });
+
+where by 'userData' is the formGroupName, 'username', 'email' & 'gender' are the formControlName of the respective FormControl element in the template. 'hobbies' will be the formArrayName of the FormArray element, while the INDEX of this array, i.e '0,' , '1', '2' ... will be the formControlName of its array of FormControl elements.
+
+The top level form group is binded as a property to signupForm variable to the form template.
+
+<form  [formGroup]="signupForm" (ngSubmit)="onSubmit()"></form>
+
+----------
+PIPES
+- To transform output
+
+username = "Max"
+
+<p>{{username}}</p>
+
+<p>{{username | uppercase}}</p> => 'MAX', where uppercase is a pipe
+
+@Pipe({ 
+  name: string
+  pure?: boolean
+})
+
+Pure and impure pipes - the pure property of Pipe decorator when creating a pipe determine whether the pipe
+needs to be re-calculated whenever the data changes. If pure (by default), means no. Impure means yes.
+Impure pipes may lead to performance issue.
+
+Special pipe: async
+{{appstatus | async}} <--- appstatus is a promise here
+async will subscribe to the promise or observable and watches for status change. It will auto unsubscribe once the component is destroyed
+
+----------
+HTTPCLIENT (or Angular 4: HttpRequest)
+	send request
+	<------------
+Server 		     	Angular App (SPA)
+	send response
+	(JSON) 
+	------------->
+
+
+HttpClientModule
+HttpClient class
+-post request to append
+-put request to overwrite
+
+If use firebase, post request will wrap every request into a unique key object, put will simply overwrite in the request object itself
+
+Response can be received as 'events', i.e. HttpEvent
+6 types of enum HttpEventType:
+{
+  Sent
+  UploadProgress
+  ResponseHeader
+  DownloadProgress
+  Response
+  User
+}
+
+Use HttpRequest for upload and download request. 
+Set reportProgress to true to get sent, upload and download progress response.
+
+Can implement HttpInterceptor to intercept HttpRequest (incoming as well as outgoing).
+The request object can then be cloned and updated before actually being sent or received by app.
+Can intercept the response as well, using the do operator on the returning HttpEvent object.
+Do operator won't 'consume' the observable like subscribe did, so the observable will still pass on.
+
+----------
+
+AUTHENTICATION
+
+Traditional Web App - Receive Session Cookie from server and identify via Cookie
+SPA - Receive and authenticate via (JSON Web) Token
+
+----------
+AppModule
+Feature (Custom) Modules - additional, secondary, not main
+
+Other FEATURE MODULES need to add CommonModule
+AppModule has BrowserModule, which already includes CommonModule
+This module has all the common directives like ngIf, ngFor etc.. I could dont import it IF the module doesnt need any of it, i.e. a shared module.. or routing module
+
+can import one module more than twice in the same app, but cannot declare one component more than twice
+this leads to a problem when there are shared components or directives
+the solution is to put these shared resources into a 'shared module' that gets imported by BOTH modules that need them
+
+when splitting modules into feature modules (child modules), take care of those routes that has children routes => that means these routes template should have a <router-outlet></router-outlet> tags. In these case, the tags need (child) access to the RouterModule. The routes could be splitted from the main routing module again, to create a child-routing.module.ts.
+
+Those components that are routed directly by the root app, i.e. doesnt have <router-outlet> in their html, could leave their routes in the main routing module file, even though their components are splitted out to create child modules. As long as the routes are defined and imported by AppModule, they are accessable.
+
+----------
+LAZY LOADING
+
+Load the child route on demand only. The component associated with the route is loaded only when called.
+
+{path : 'recipes', loadChildren: './recipes/recipes.module#RecipesModule'} -- the /*module name/#*class name*
+
+Do NOT provide Services in Shared Modules. 
+- Services provided in lazy loaded modules will always be injected as separate child instance
+- Services provided in (eager loaded) feature modules will be loaded at Application Launch and injected at root level.
+--> hence, better provide all services at root AppModule
+
+TAKE NOTE for common modules like HttpClientModule as well!
+When providing for HttpInterceptor.. which is essentially an injectable service, make sure the HttpClientModule is imported only ONCE at ROOT level! and the HttpInterceptor is provided only ONCE at ROOT level!
+
+For e.g.:
+HttpInterceptor - provided at root level
+HttpClientModule - imported multiple times in shared module <---- bad e.g.
+
+*ForFeature module (lazily loaded child instance) will ignore the HttpInterceptor at root level
+
+HttpClientModule - import ONCE at root level (either in core module once, OR straight at app.module) <---- good
+
+---------
+COMPILATION
+
+Angular Cli compiles typescript to javascript
+Angular compiles all templates to javascript as well to improve performance (in accessing DOM)
+
+JIT - Just in time - Dev -> Prod -> App downloaded in Browser -> Angular Parses & Compiles Templates (to JavaScript)
+AOT - Ahead of time - Dev -> Angular Parses & Compiles Templates -> Prod -> App downloaded in Browser
+vendor.bundle.js includes the compiler. If use AOT, it should shrink
+
+--------
+DEPLOYMENT
+ng build --prod --aot
+
+set the correct <base> element
+if app is parked at example.com/my-app, should have <base href="/my-app/">
+
+Make sure server ALWAYS returns index.html, even in case of 404
+
+-------
+NGRX - Application State
+
+For simple application
+-Using a service to manage state, as a central place to do things (change data etc) in one state
+-Using subject to notify the rest of the app when change has taken place
+
+Redux
+Reducers are function (developer write) which take an action and a potential payload as input, n then do something to manipulate the original state (Saves reduced state immutably -> dont change the old state, but clone the existing old state, update the clone and overwrite the old state.. something like HttpHandler).
+
+@ngrx/store is a controlled state container designed to help write performant, consistent applications on top of Angular. Core tenets:
+
+-State is a single immutable data structure
+-Actions describe state changes
+-Pure functions called reducers take the previous state and the next action to compute the new state
+-State accessed with the Store, an observable of state and an observer of actions
+
+action.ts - with defined classes which implement Action; it needs to define the type, i.e. the const variable that can be recognized by a reducer (later). It also needs to define payload (to be able to be passed to reducer) if any.
+
+reducer.ts - a function that (is registered at AppModule) and has a switch statement that switch between action type. It performs state updates synchronously according to the action type. The state is (preferrably) changed immutably, i.e. using Object.assign/ the more advanced js spread ... function.
+
+*Reducers has to take in state and return a state synchronously, it cannot return a promise/observable.
+
+since reducers alone are not enough in dealing with observables' 'side-effects', i.e asynchronous code. There is @ngrx/effects library to deal with that.
+
+effects are similar to reducers, in that they are dispatched by store according to action.type. But their main purpose is to deal with the side-effects of reducers, i.e. async methods (that produces observables/promises) that cannot be executed in reducers. Effect decorated 'actions' (which are array/streams of 'action') can be used to map payload to async methods, processing these async return objects and finally dispatch some other action(s) or NOT.
+
+@ngrx/router-store - to deal with routing state
+
+store can select specific item state within state... for e.g. if the reducer's state is 
+
+export interface State{
+    token : string;
+    authenticated : boolean;
+    signup_fail_message: string;
+    signin_fail_message: string;
+}
+
+this.store.select('auth') will select the state entirely..
+this.store.select('auth','token') will select the state of the token
+can keep on doing this until 6 levels deep
+this.store.select('auth','token','3','4','5','6') = State['token']['3']['4']['5']['6']
+
+
+
+Reducer receive this actions. Effects can listen to this actions.
+ROUTER_NAVIGATION - dispatched by router, before any guards or resolvers run.
+ROUTER_CANCEL - guard cancel navigation. or reducer throw error.
+ROUTER_ERROR - navigation error
+ROUTER_CANCEL and ROUTER_ERROR contain the store state before the navigation.
+
+The rules of state management:
+1. Router(URL) as the source of truth 
+2. Optimistic updates require separate actions (in reducer) to deal with errors.
+3. Use immutable data for persistent and client state
+4. NgRx should the means of achieving a goal, not the goal (means not the only means)
+
+Side notes:
+State management should be seperated from computation. 
+i.e. All services in Angular should be 'stateless'. All HTTP Get and Post (also included as 'computation') should not 
+be mixed together with state.
+Navigation happens AFTER the store + reducer step
+All states: Persistent State, Client state, Transient Client State and URL/Router state
+should be handled by NgRx (or can be said, separated out) in this case.
+
+
+Programming with NgRx is programming with messages. In NgRx they are called ‘actions’.
+Components create and dispatch actions.
+Actions can be categorized as commands, events, and documents.
+A command has a single handler, and we often expect a reply after dispatching it.
+Events and documents can have multiple handlers, and we do not expect replies.
+Deciders, transformers, reducers, and side effects are the building blocks we use to express our application logic. They compose well.
+
+--------------------------------
+********************************
+IMPORTANT:
+
+Effects are listeners to actions. They need to 'continue listening'.
+
+RxJS is internally wrapping code in operators (like map, filter, etc) with a try / catch. If an error is caught, it will notify subscribers, and then unsubscribe the stream. This is hard coded — you have no choice!
+If an error is thrown within an operator, the stream will always complete.
+
+We dont SUBSCRIBE to the effects. 
+We dont THROW or CATCH inside an effect 1st level stream. Error can be catch in the inner (2nd level) stream and returned as a new observable.
+
+someAction$.switchMap(()=>{
+      return fromPromise(firebase.auth().currentUser.getIdToken()) //<----1st level return for switchMap
+      .catch(error=>{ //<---2nd level operator with  for the 1st level
+        console.log("getIdToken error "+ error.message);
+        return Observable.of(error); //when error happens, 2nd level will work to return a new observable of error
+      })
+    }
+  )//switchMap will either return observable with type (token) or type (error)
+
+//an observable operator (i.e transformer) must ALWAYS return an observable of something.. unless it is subscribe()
+
+
+
+
+--------------------------------
+---------
+
+LifeCycle hooks
+
+ngOnChanges - when a new component is created, when @Input() changes
+ngOnInit - when component is initialized after the constructor, get called after DOM elements has been initialized
+ngDoCheck - run whenever something needs to be checked (frequently)
+ngAfterContentInit - after ng-content has been projected into this view with the selector (of child component maybe)
+ngAfterContentChecked - after ngDoCheck on the above
+ngAfterViewInit - after this component's view (all DOM objects) has been initialized. Before this, the DOM objects are null.
+ngAfterViewChecked - after ngDoCheck on the above
+ngOnDestroy -  right before component gets destroyed
+-----------
+
+Since bootstrap uses JQuery and if enabled, this clashes with Angular's framework, a set of native Angular
+directives have been developed to handle some special cases of bootstrap objects that require JS
+
+https://ng-bootstrap.github.io
+
+-----------
+CLI
+1. ng generate component "component name" - to auto generate component
+	*ng g c "component name"
+
+If Universal is done, the this auto generate function might complain:
+
+More than one module matches. Use skip-import option to skip importing the component into the closest module.
+
+Since it doesnt know which module file to use, there are app.module.ts and app.server.module.ts now.
+
+Use the --module to choose
+
+ng g c 'auth' --module=app
+
+can even choose existing custom feature module!
+
+ng g c 'something' --module=core for e.g.
+
+-----------
+For development debugging only,
+The js files are mapped to source maps and can step into the ts files, subsequently place breakpoint to debug
+Alternatively, the easier way is to access the ts files via webpack
+- Can also use Augury dev tools! Nice tool to analyse app at runtime
+
+-----------
+Angular UNIVERSAL
+- App runs on browser but can be rendered on Server
+- Such that when view source code (google spider) can see the html content instead of use app-root
+
+-----------
+Angular ANIMATIONS
+- Defined on componenets via DSL (Domain Specific Language)
+- Listen for state changes on an element within the template, Angular can animate the arc in between
+- Similar to how CSS transitions work
+
+-----------
+Angular UNIT TESTING
+- run ng test --sourcemap=false (or -sm=false) to get better error 
+- need to do 'fixture.detectChanges()' whenever there's changes in the data within the component
+- async is used to wrap a spec function into a asynchronous testing zone. Only used when there's async event involved.
+- can also use fakeAsync and tick(...time elapsed) to simulate asynchronous activity
+
+
+
+----------
+How to create custom built Angular project (without using cli)
+- create project folder
+- npm init, enter details -  a package.json will be created
+- install angular packages
+- create the folder structure - with main.ts, index.html, polyfill.ts
+- create angular files - all the components, css, html and module (inc routing) files
+- install dev dependencies
+- setup development workflow (for dev) - tsconfig.json
+	- install webpack related packages
+	- setup webpack config files - webpack will be used to bundle and host
+- setup the production workflow (and AOT)
+
+-----------
+	
+- ngc is ng (Angular) compiler 
+
+ngc compile the ts codes based on tsconfig file, which will generate all those *js, *ngsummary.json, *ngstyle* etc files
+
+and then pass on to webpack to package, i.e. compile with main.aot.ts
+
+----------
+to be responsive - 
+@angular/flex-layout
+
+so inorder NOT to use bootstrap, use 
+@angular material + @angular flex-layout
+
+
+else use bootstrap + @ng-bootstrap
+
+
+---------
+Note on hosting:
+1. Static page hosting on AWS or Firebase will load the js code on browser. Hence, user side can easily see the config settings!
+2. Server side hosting will hide the js (server) code & store env (config) settings!. Angular Universal can also be available. This is the only (maybe.. if I dont mind the config being seen by the world) option going production live.
+	- try firebase-functions * firebase-admin
+
+
+
+
+
+
+
+
+

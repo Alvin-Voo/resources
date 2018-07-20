@@ -1,0 +1,38 @@
+switchMap vs mergeMap
+
+const post$ = Rx.Observable.of({id: 1},{id: 2},{id: 3});  //source or outer observable
+const getPostInfo$ = Rx.Observable.timer(1000).mapTo({title: "Post title"}); //inner observable
+ 
+const posts$ = post$.mergeMap(post => getPostInfo$).subscribe(res => console.log(res));
+
+vs
+
+const posts$ = post$.switchMap(post => getPostInfo$).subscribe(res => console.log(res));
+
+consider the above example:
+1. If using mergeMap the result will be:
+
+{title: "Post title"}
+{title: "Post title"}
+{title: "Post title"}
+
+Only when the inner observable emit (i.e. in 1 sec time), return the result by merging with the outer observable
+
+2. If using switchMap:
+
+{title: "Post title"}
+
+Like mergeMap, but when the SOURCE observable emits, CANCEL any previous subscription with the inner observable. 
+(means restart the subscription of the inner observable)
+
+Another example:
+
+const clicks$ = Rx.Observable.fromEvent(document, 'click'); //source observable
+const innerObservable$ = Rx.Observable.interval(1000); //inner observable
+
+clicks$.switchMap(event => innerObservable$).subscribe(val => console.log(val));
+
+[CLICK] -> start logging 0..1..2..3..4.. ..
+[CLICK] -> restart logging 0..1..2..3.. ..
+
+

@@ -1,0 +1,376 @@
+Node (or javascript) is a javascript runtime built on Chrome's V8 Javascript engine
+Chrome V8 Engine which converts javascript to machine code (in both browser and local)
+
+How does the V8 'translate' between browser to local machine?
+Browser's 'window' object = node local 'global' object
+'document' object = 'process'
+
+can execute global in node shell to see all the global functions and variables available.
+
+----------------------
+
+ES 6 template strings
+
+using uptick - 
+`Hello ${user.username}!`
+
+
+----------------------
+Module is an object within Node js
+module.exports is an object you can add stuffs to and will be accessible in the required object
+
+notes.js
+--------
+module.exports.addNote = ()=>{
+  console.log("add note");
+  return "new note";
+}
+
+app.js
+------
+const note = require('./notes');
+console.log(note.addNote()); //add note -> new note
+
+------
+Use nodemon to watch development and restart nodejs app
+
+------
+Single quote is not valid in JSON string
+
+object
+{ name: 'Alvin'}
+
+JSON string
+{ "name":"Alvin" }
+
+------
+Node debugger /inspector
+- use command node inspect <filename> to kick start, add the keyword inspect
+- inspector will run line by line
+- use 'n' for next
+- use 'c' for continue
+- list(..number of lines) to view
+- use repl (Read-Eval-Print-Loop) to get into this virtual environment where you can manipulate variables.
+- write 'debugger' keyword in javascript to set breakpoint, can use 'c' in inspector to run straight to that line
+- can use nodemon inspect with breakpoint as well.. to continuosly change file (nodemon will restart) and debugging
+
+more user friendly way is to use chrome debugger
+node --inspect-brk <filename> 
+and open up chrome://inspect, check that the remote target is connected
+and click 'Open dedicated DevTools for Node"
+
+-------
+
+callback functions - a function that get passed an argument to another function and gets executed after some event has happened
+
+V8 Call stack and Event Loop
+
+setTimeout is a Node API function and will be placed in the Callback queue once timeout is reached
+Event Loop will only run callback queue once call stack is totally empty (means once main() has returned)
+
+
+Call		      Node
+Stack  ------------>  APIs
+
+ _______		|
+^ Event |		|
+| Loop  |		|
+|_______V  		V
+
+        Callback Queue
+
+
+--------
+use JSON.stringify(<object>,undefined,2) to pretty print objects
+
+
+-------
+
+EXPRESS
+
+res.send(..) will automatically assign the content/type according to what is sent,
+string type - text/html
+array or object - application/json
+buffer - application/octet-stream
+
+all views for template engine are located in views/
+
+Handlerbars: -
+Use partials for reusable template code
+
+hbs.registerPartials(__dirname+'/views/partials');
+app.set('view engine','hbs');
+
+where /views/partials contains the hbs files with the partial template
+for e.g. /views/partials/footer.hbs
+
+include the partial template in hbs templates by:
+
+<html>
+..
+<body>
+{{> footer}}
+</body>
+</html>
+
+common functions can be registered as helper and used just as {{<helper function..>}}
+
+hbs.registerHelper('getCurrentYear', ()=>{//hbs will look for helper first before looking to the arguments passed in
+  return new Date().getFullYear()
+});
+
+--------
+Middleware
+
+app.use([path],callback..)
+
+Middlewares will be called in the order of how they are mounted.
+
+Middleware mounted without a path will be executed for every request to the app.
+
+next() handler is to forward the route, if it's not called, it will be 'stuck' or stop inside the async callback function
+of that middleware
+
+--------
+
+Server needs to be restarted for template rendering changes (by server) to take effect,
+by default nodemon only watches js file:
+
+nodemon server.js -e js,hbs
+
+--------
+
+Mocha - test framework/suite for nodejs
+-BDD - behaviour driven development .. have it() function
+
+use nodemon --exec 'npm test' to automatically execute the test files when there are changes
+
+mjackson/expect - Assertion library for javascript
+
+-use describe to group test together
+
+describe('<group name>', ()=>{
+	it('test 1',()=>{});
+	it('test 2',()=>{});
+	...
+
+	describe('#level 2', ()=>{ //describe can be nested to even make more readible test results
+		it('test 3',()=>{});
+		it('test 4',()=>{});
+	})
+}) 
+
+-use spy to spy on functions
+
+expect also includes the ability to create spy functions that can track the calls that are made to other functions and make various assertions based on the arguments and context that were used.
+
+-useful for testing when the end point is not yet hooked up (like DB or some API) but can test on the arguments called and simulate the return
+
+Async function
+--------------
+- testing async function if takes more than 2 seconds (to resolve or to return), mocha will fail the test
+- need to use done() function to let mocha's callback test function knows that it can only finish when done() is called
+
+
+SUPERTEST
+---------
+-test library for express
+
+REWIRE
+------
+-library for monkey-patching node.js script
+-easy setting and getting for private variables (injecting different values than original)
+
+rewire adds a special setter and getter to modules so you can modify their behaviour for better unit testing. You may
+
+*inject mocks for other modules or globals like process
+*inspect private variables
+*override variables within the module.
+
+
+REST (Representational State Transfer)
+----
+REST (REpresentational State Transfer) is an architectural style for developing web services. REST is popular due to its simplicity and the fact that it builds upon existing systems and features of the internet's HTTP in order to achieve its objectives, as opposed to creating new standards, frameworks and technologies.
+
+A RESTful API is an application program interface (API) that uses HTTP requests to GET, PUT, POST and DELETE data.
+
+
+POSTMAN
+-------
+An easy app that lets you make http request (and view the results)
+
+
+
+SOCKET.IO
+---------
+-chrome dev tool network debugging, use '-scheme:chrome-extension' to hide chrome extensions
+
+const http = require('http');
+const express = require('express');
+const socketIO = require('socket.io');
+
+let app = express();
+let server = http.createServer(app);
+let io = socketIO(server);
+
+io.on('connection',(socket)=>{ 
+//socket is from client //use .on(..) to listen to events, there are some built-in events for browser and server
+  console.log('New user connected: ',socket.id);
+
+  socket.emit('newEmail', {from: 'alvin@1.com', type: 'email'})//emitting/sending an event
+	
+  socket.on('createMessage', (message)=>{
+    console.log(socket.id,' create Message ',message);
+    io.emit('newMessage',{ //io.emit is server broadcasting events to all clients
+      from: message.from,
+      text: message.text,
+      createdAt: new Date().getTime()
+    })
+
+    socket.broadcast.emit('newMessage',{ //socket (client) broadcasting events to all clients EXCEPT itself
+      from: message.from,
+      text: message.text,
+      createdAt: new Date().getTime()
+    })
+  })
+  
+  socket.on('disconnect', ()=>{
+    console.log(socket.id+' Disconnected ');
+  })
+})
+
+server.listen(port, ()=>{
+  console.log('started on port '+ port);
+});
+
+------------------------------
+<script src="/socket.io/socket.io.js"></script>//once server is listening, the socket io client library is available at this link
+let socket = io();//this one starts the polling in client side
+
+socket.on('connect',function(){
+  console.log(socket.id,' is connected to server');
+
+  socket.emit('createMessage',{....data..});
+})
+
+socket.on('disconnect',function(){
+  console.log(socket.id,' is disconnected from server');
+})
+
+socket.on('newEmail',function(email){//listening to the event
+  console.log('New Email', email);
+})
+
+socket.on('newMessage',function(message){
+  console.log('New Message', message);
+})
+---------------------------------
+All socket methods will return Socket object. So can chain socket methods together one after another.
+---------------------------------
+Event acknowledgement
+
+-Acknowledge the event when client has (un)uccessfully sent to the server
+
+
+server.js
+---------
+  socket.on('createMessage', (message, callback)=>{    //(message, callback)..these two arguments are passed from client socket.emit
+    console.log(socket.id,' create Message ',message);
+    io.emit('newMessage',generateMessage(message.from, message.text));
+    callback('acknowledge');  //<----acknowledgement sent to client by callback function
+  })
+
+
+client.js
+---------
+socket.emit('createMessage',{ //passing 2 arguments to server, one object and one callback function
+  from:'dudue',
+  text: '123'
+}, function(data){
+  console.log('got ack ', data); //<----callback function to receive acknowledgement from server
+})
+
+--------------------------------------
+Socket rooms
+
+socket.join('someroomname');
+socket.leave('someroomname');
+
+GLOBAL                   SOMEROOM
+------                   --------
+io.emit               -> io.to('someroomname').emit    === emit to all
+socket.broadcast.emit -> socket.broadcast.to('someroomname').emit === emit to all, except this socket(user)
+socket.emit           -> same..         === emit to this socket(user) only
+
+-------useful info-----------
+
+// sending to sender-client only
+ socket.emit('message', "this is a test");
+
+ // sending to all clients, include sender
+ io.emit('message', "this is a test");
+
+ // sending to all clients except sender
+ socket.broadcast.emit('message', "this is a test");
+
+ // sending to all clients in 'game' room(channel) except sender
+ socket.broadcast.to('game').emit('message', 'nice game');
+
+ // sending to all clients in 'game' room(channel), include sender
+ io.in('game').emit('message', 'cool game');
+
+ // sending to sender client, only if they are in 'game' room(channel)
+ socket.to('game').emit('message', 'enjoy the game');
+
+ // sending to all clients in namespace 'myNamespace', include sender
+ io.of('myNamespace').emit('message', 'gg');
+
+ // sending to individual socketid
+ socket.broadcast.to(socketid).emit('message', 'for your eyes only');
+
+//getting all clients in this namespace, default is '/'
+io.clients((error, clients) => {
+  if (error) throw error;
+  console.log(clients); // => [6em3d4TJP8Et9EMNAAAA, G5p55dHhGgUnLUctAAAB]
+});
+
+
+-----------------------------------
+HTML5 Geolocation API wont work with HTTP connection. Must be secured HTTPS.
+
+let locationButton = jQuery('#send-location');
+locationButton.on('click', function(){
+  if(!navigator.geolocation) {
+    return alert('Geolocation not supported by your browser.')
+  }
+
+  navigator.geolocation.getCurrentPosition(function (position){
+    socket.emit('createLocationMessage',{
+      latitude: position.coords.latitude,
+      longitude: position.coords.longitude
+    })
+  }, function(e){
+    console.log(e);
+    alert('Unable to fetch location')
+  })
+
+
+what we can do in terms of testing locally is to set some fake data using chrome dev tool's sensor
+
+---------------------------------------
+Moment.js - javascript date library to manipulate dates easily
+
+---------------------------------------
+
+Mustache.. much like handlebars, is a logic-less templates. Let developer built dynamic templates for javascript.. or other language.
+
+
+Templates can be rendered from server side or browser
+
+The previous examples with handlebars are rendered at server side. This mustache example (socket io lesson 119) is rendered at client side with data fed from server
+
+--------------------------------------
+?param1=data1&param2=data2
+
+all params passed into browser can be get from window.location.search
+

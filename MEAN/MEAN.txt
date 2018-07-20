@@ -1,0 +1,352 @@
+We create the server itself for nodejs
+
+A view engine, for e.g. handlebar (hbs file)  is a template the server dynamically inject back to the client for viewing.
+
+express.static('public' path...) serves the static hosting (available to public)
+
+Server side ONLY application => expressjs + handlebar
+
+expressjs - process input and pass json-like output via res.render('page', {output: data...})
+handlebar - able to parse json-like input using curly brackets
+
+HTTP: POST requests supply additional data from the client (browser) to the server in the message body. In contrast, GET requests include all required data in the URL.
+
+HTTP Methods (most common):
+GET - Get a resource
+POST - Create a resource
+PATCH - Update a resource
+PUT - Replace a resource
+DELETE - Delete a resource
+...
+
+Express JS:
+let router = express.Router()
+router.(HTTP Methods..i.e. get post put.. etc)
+
+//function(req, res, next) callback function
+//req is request sent, res is response built by express js, next is called for route (request) to continue
+router.get('/', function (req, res, next) {
+  res.render('index');
+});
+
+...
+
+In the server file, ie root/app.js file
+
+all the app.use(...) are middle ware configurations, where use is the keyword
+
+--------------------------
+--------------------------
+Some tools for our express js webserver: 
+
+Nodejs backend not only able to serve ordinary websites but also mobile apps as well. 
+Hence authentication status shouldn't be stored in session since client only reaches to server to fetch or put data.
+
+--------------------------------------
+A little details about cookie vs token authentication
+*Cookie based authentication is stateful. This means that an authentication record or session must be kept both server and client-side.
+
+*Token-based authentication is stateless. The server does not keep a record of which users are logged in or which JWTs have been issued. 
+
+--------------------------------------
+SHA256 hashing
+
+-one way obfuscating data into hash string that is unrecognizable and unrevertable
+-salt .. a secret 'ingredient' added into the hash string by server (such that the client won't know) so that the client cannot 'trick' the server by sending other commands by hashing other people's account data
+
+--------------------------------------
+JWT
+
+3 parts:-
+
+Header -> base64UrlEncoded
+
+Payload(data) -> base64UrlEncoded
+
+Signature -> HMACSHA256(base64UrlEncode(header) + "." +
+  base64UrlEncode(payload), 'somesecret/salt') -> this will change everytime the token is generated, one way hashing
+
+--------------------------------------
+Express app.use vs app.get
+
+By specifying / as a "mount" path, app.use() will respond to any path that starts with /, which are all of them and regardless of HTTP verb used:
+
+GET /
+PUT /foo
+POST /foo/bar
+etc.
+
+app.get(), on the other hand, is part of Express' application routing and is intended for matching and handling a specific route when requested with the GET HTTP verb:
+
+GET /
+
+The routing methods, including app.get(), are convenience methods that help you align responses to requests more precisely. They also add in support for features like parameters and next('route'). While app.use is amount to
+
+app.all(/^\/.*/, function (req, res) {
+    res.send('Hello');
+});
+
+https://stackoverflow.com/questions/15601703/difference-between-app-use-and-app-get-in-express-js
+
+-------------------------------------
+body-parser is now inbuilt from express 4.16 onwards
+
+app.use(express.json());//<--- can now send json body as request to this server (API)
+
+take note that to send any JSON data to server, the header content-type must be application/json
+
+can use POSTMAN to simulate sending messages to server
+
+--------------------------------------
+SCAFFOLDING for expressjs:
+
+A handle application generator tool: express-generator that will generate the whole folder structure. This is one of the many ways to structor express project.
+
+install it globally
+npm install express-generator -g
+by default, it generate view engine for Pug, set it to hbs as below
+express . --view=hbs
+install all dependencies
+npm install
+run the server
+npm start
+
+--------------------------------------
+BCRYPT:
+use bcrypt js to convert password into hash stored in mongo db
+
+var bcrypt = require('bcryptjs');
+
+
+var bcrypt = require('bcryptjs');
+var salt = bcrypt.genSaltSync(10);
+var hash = bcrypt.hashSync("B4c0/\/", salt); // var hash = bcrypt.hashSync("B4c0/\/", 10);
+// Store hash in your password DB.
+
+// Load hash from your password DB.
+bcrypt.compareSync("B4c0/\/", hash); // true
+bcrypt.compareSync("not_bacon", hash); // false
+---------------------------------------
+JSONWEBTOKEN:
+let jwt = require('jsonwebtoken')
+
+jwt.sign(...) //<--use this to sign/create token
+jwt.verify(...) //<--use this when verifying token
+jwt.decode() //<--use this when decoding token
+
+There's no straight forward way to 'invalidate' the token on server side once user has logged out.
+
+Either keeping a 'whitelist' of token array or a 'blacklist' of already logged out array will need server / db maintenance to purge the list.
+
+One solution - 
+Assign a shorter expiry time on the token when first signed
+Push the token into User document in db
+Once user logout:
+1. Remove token from client side (local storage)
+2. Remove token from User document token array in db
+
+Everytime user authenticates -
+1. Verify token
+2. Find with the token, if not found, authentication error
+
+---------------------------------------
+ACCESS protection:
+-Backend (data) access need protection, as well as front end need route guards etc
+-Checking of important validation in backend, as well as front end (for better user experience, javascript can be hacked)
+
+
+**************************
+--------------------------
+Mongo DB:
+
+Settings under /etc/mongod.conf
+Data files /var/lib/mongodb/
+Log files /var/log/mongodb/
+
+
+under /usr/bin
+./mongod to start mongo db or service mongod start to start as service
+./mongo is the shell for mongo db
+
+MongoDB stores B(Binary J)SON documents, i.e. data records, in collections; the collections in databases.
+
+-------------------------
+
+Mongodb native - ODM (built by Mongo team) -  official MongoDB driver for Node.js
+Mongoose - ORM
+
+
+ORM or Object Relational Mapping is based on the principal of having strict models or schemas. In ORM, which mongoose is using, you have to define your schema structure. There has to be a fixed schema.
+ODM or Object Document Mapping is the core concept of mongo itself; and same goes with mongodb native driver. Mongodb doesn’t need any fixed schema. You can insert or update whatever and however you want.
+
+-------------------------
+node-mongodb-native
+
+const MongoClient = require('mongodb').MongoClient;
+
+MongoClient.connect('mongodb://localhost:27017/', (err,client)=>{
+  if(err) return console.log('Unable to connect to MongoDB server');
+
+  console.log('Connected to MongoDB server');
+
+  db = client.db('TodoApp');
+
+  db.collection('Todos').insertOne({
+    text: 'Something to do',//id generated by driver here
+    completed: false
+  }, (err, result)=>{
+    if(err) return console.log('Unable to insert todo', err)
+  
+    console.log(JSON.stringify(result.ops, undefined, 2));
+    console.log(result.ops[0]._id.getTimestamp()); //ObjectID.getTimestamp()
+  })
+
+  client.close();
+})
+
+Object id contains:
+a 4-byte value representing the seconds since the Unix epoch,    <---hence can get timestamp from id
+a 3-byte machine identifier,
+a 2-byte process id, and
+a 3-byte counter, starting with a random value.
+
+-------------------------
+MONGODB update operators
+
+https://docs.mongodb.com/manual/reference/operator/update/#id1
+
+-------------------------
+
+mongoose - client (library) for NodeJs server to access MongoDB:
+- with Schemas & Models, Validation and Database operations
+
+- Schema is a blue print (just like in RDBMS)
+- (Data) Model translates to a 'collection' in MongoDB, with lower case add plural 's' (i.e. User becomes 'users') for MongoDB collection
+- A Model is like a class, an instance of Model is a Document
+- A collection is like a table (in RDBMS)
+- One collection can have multiple documents
+- A document is like a data record (or called row in SQL table)
+- A document have mutiple field(s) - (or called column in SQL table)
+-------------------------
+
+var kittySchema = mongoose.Schema({   //1.declare schema
+  name: String
+});
+// NOTE: methods must be added to the schema before compiling it with mongoose.model() //2.adding method(s)
+kittySchema.methods.speak = function () {
+  var greeting = this.name
+    ? "Meow name is " + this.name
+    : "I don't have a name";
+  console.log(greeting);
+}
+
+var Kitten = mongoose.model('Kitten', kittySchema); //3. compiling schema into a model (collection in mongoDB)
+var fluffy = new Kitten({ name: 'fluffy' }); //4. initialize document instance (one instance of collection)
+fluffy.save(function (err, fluffy) { //5. saving the document
+    if (err) return console.error(err);
+    fluffy.speak();
+  });
+
+Kitten.find(function (err, kittens) {//6. Querying through model
+  if (err) return console.error(err);
+  console.log(kittens);
+})
+
+Kitten.find({ name: /^fluff/ }, callback); //7. or using rich syntax
+
+all methods of Model, for e.g. save(...), findOne(...) will have callback functions to execute upon return.
+Callback functions are used because of the asynchronous nature of execution.
+If not using callback, a promise will return that can be .then()
+
+* Do not declare methods using ES6 arrow functions (=>). Arrow functions explicitly prevent binding this, so your method will not have access to the document and the above examples will not work.
+
+-------------------------------
+define a document instance method like 
+
+kittySchema.methods.speak = function () {}
+
+define a model (or 'class') method like
+
+kittySchema.statics.searchByName = function () {}
+
+-------------------------------
+Can 'hook up' a check pre or post function
+
+Middleware (also called pre and post hooks) are functions which are passed control during execution of asynchronous functions
+
+-------------------------------
+__v property in document created by mongoose came from mongoose! it specifies the version of the document.
+
+
+unlike in node-mongodb-native where we need to pass in _id: new ObjectId('...'), mongoose can directly pass in the id number as string
+Somemodel.find({_id:'12345...'})
+.then((result)=>{
+))...
+-------------------------------
+
+Mongo DB has sql like syntax.. 
+
+updating the users collection for ALL documents, pull (remove)  (all) the entries from message array
+db.users.update({},{$pull:{messages:{$exists: true}}})
+
+-------------------------------
+
+Launching nodejs app for Heroku deployment:
+
+Heroku will run npm run start if Procfile is not available
+
+if have a build step that needs to be run when deploying, can put in a postinstall script. For e.g., if you don't want to build the resulting bundle.js in a bin folder beforehand and needs webpack to build a 'bundle.js'
+
+https://devcenter.heroku.com/articles/nodejs-support
+
+Can use Heroku's environment variables to store server side variables and accessed using process.env.*
+
+command:-
+heroku logs  -- to check server logs.. very useful
+
+-------------------------------
+Usually 3 environments in industrial development standard, production, development and test
+
+this env var is commondly used:
+
+process.env.NODE_ENV === 'production' || 'development' || 'test'
+
+can use this to distinguish environments
+
+-------------------------------
+
+Launching nodejs app for Beanstalk deployment:
+
+first try to launch 
+1. node server.js
+2. node app.js
+3. npm run start
+
+-------------------------------
+ANGULAR:
+Scaffolding for Angular without using cli (integrate with Express)
+- copy and paste all @angular dependencies into package.json
+- add in zone.js core-js & rxjs
+- add in dev dependencies @types/core-js @types/node for providing typescripts with the core-js and nodejs types
+
+
+
+# these are equivalent
+ng build --target=production --environment=prod
+ng build --prod --env=prod
+ng build --prod
+# and so are these
+ng build --target=development --environment=dev
+ng build --dev --e=dev
+ng build --dev
+ng build
+
+
+Manual Build process:
+
+All command (executable files) for npm for a local project are in /node_modules/,bin/
+
+You can test run a npm command by ./node_modules/.bin/ngc -p tsconfig.aot.json for e.g. Its a good way to gain more piecemeal understanding.
+
+ngc is Angular's compiler-cli. It is used for AOT compilation, to compile all ts, html and css code into js file(s). And the most important app.module.ngfactory.js which will be used by webpack (based on entry point in main.aot.ts) to package/bundle up into a single bundle.js (or if used angular cli - the 4 js files)
+

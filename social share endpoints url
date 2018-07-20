@@ -1,0 +1,6 @@
+TWITTER_ENDPOINT = 'http://twitter.com/intent/tweet?text=%s'
+FACEBOOK_ENDPOINT = 'https://www.facebook.com/sharer/sharer.php?u=%s'
+GPLUS_ENDPOINT = 'https://plus.google.com/share?url=%s'
+MAIL_ENDPOINT = 'mailto:?subject=%s&body=%s'
+LINKEDIN_ENDPOINT = 'http://www.linkedin.com/shareArticle?mini=true&title=%s&url=%s'
+REDDIT_ENDPOINT = 'http://www.reddit.com/submit?title=%s&url=%s'

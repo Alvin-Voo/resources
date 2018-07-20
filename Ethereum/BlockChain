@@ -1,0 +1,817 @@
+Blockchain - A tool to store monetary transactions between different people. Like a simple database.
+
+Decentralized Autonomous Corporations (DAC)
+
+Dapp - decentralized application. A DApp has its backend code running on a decentralized peer-to-peer network. Contrast this with an app where the backend code is running on centralized servers.
+
+Smart Contracts - the initial code deployed in block chain is IMMUTABLE. The code is law.
+
+Ethereum nodes communicate with a language called JSON-RPC. Web3.js handles all these JSON-RPC format under its hood.
+
+(For Developers)web3.js --> Ethereum Networks <-- (For Consumers)metamask, mist browser
+
+Metamask 
+-Account Address  --hexadecimal string
+-Public Key (same like a machine?) --hexadecimal string 
+-Private Key (same like a machine?) --hexadecimal string
+
+One account interacts with all networks
+1.Main
+2.Ropsten
+3.Kovan
+4.Rinkeby
+
+If a transaction is made in Rinkeby network, the amount of ether will only be available in that particular network. Not in other networks.
+
+A transaction technically is made up of
+nonce - a number that is used only once
+to
+value
+gasPrice
+startGas or gasLimit
+v, r and s - Cryptographic pieces of data that can be used to generate the senders account address. On way usage. Generated from the sender's private key.
+
+When a transaction was sent to a node of a network, it goes into a block where 'mining' or technically verification happens
+
+-----------------------------------
+SHA256 hash
+
+A signed block = when the block no. + nonce (minable) + data is set to a hash starting with 000
+
+A blockchain = blocks that are linked together with previous block's hash (something like a linked list). Changing any data of the blocks will need remining of hash beginning from that block until the last block. I.e. its resistable to change. Immutable.
+
+In a distributed blockchain system with many peers, all block chains must be same. Can look at the hash of latest blockchain to identify which one is the odd one.
+
+Tokens = blockchain with transaction information as data. Plenty of transaction information chained together. The immutability of blockchain is to prevent the changes to these transaction data.
+
+Coinbase = orginal source of money
+
+With coinbase and all transaction data, we can trace all the way back to the source of money.
+
+A block components:
+Block no.
+Nonce.
+Coinbase.
+Tx.
+Prev.
+Hash.
+
+---------------------------------------
+
+Mining = Calculate (Keep incrementing) the value of nonce such that the hash value for the combination of data and nonce can be converted from a base hex into a base ten which meets some criteria (for e.g. lesser than 100).
+
+for e.g. 0x0000438d7625b86a6f366545b1929975a0d3ff1f8847e56cc587cadddb0ab781
+
+A hash has 64 decimal places
+
+Block time = The amount of time taken to hash everything from 0 to the target nonce value.
+
+The target block time is about 15 seconds. The network will adjust this target from block to block, if the speed is slow, the target criteria will be increased, if the speed if fast, it will be decreased.
+
+Total time usage (round trip) reflected maybe anytime from 15 to 30 seconds, including mining's time, distribution time of blockchain to all nodes in the network and coming back.
+
+---------------------------------------
+Smart contract - An account controlled by code
+
+Contract Account:
+1. Balance
+2. Storage
+3. Code
+
+An external account (like the one created by Metamask) can connect to all networks separately.
+
+A contract account can only exists in one network internally per se. It can be deployed separately into other networks.
+
+A contract is instantiated/deployed (as contract instance/contract account) in a network.
+---------------------------------------
+A contract is essential a transaction (has transaction's components) but without the 'to' field and has the bytecode of the contract in the 'data' field. 
+
+When a transaction is transferred to network without a 'to' field, it will be instantiated as a contract with empty data.
+
+i.e. Changing ANYTHING on the blockchain will require a submission of transaction.
+
+https://www.draw.io/#HStephenGrider%2FEthereumCasts%2Fmaster%2Fdiagrams%2F02%2Fdiagrams.xml
+
+
+---------------------------------------
+---------------------------------------
+PRACTICAL below:
+---------------------------------------
+---------------------------------------
+Solidity
+
+-Some language like Javascript that drafts out the contract definition
+
+  	Contract Definition
+	 	|
+	 	|
+	 	|
+	 	V
+  ______Solidity Compiler(solc)__
+ |		     		|
+ |		     		|
+ |		     		|
+ V		     		V
+ByteCode	   Application Binary Interface(ABI)
+ |		     		|
+ V		     		V
+Deploy 	    		      Web3 (Library that provides Javascript 
+ |				with programatic access to the contract/blockchain)
+ |				|
+ |				|
+ |				|
+ V				|
+..................		|
+Contract Instance  <------------
+
+
+------------------------------------------
+ERC20 Tokens (think of game tokens! Tokens like currencies!)
+
+A token on Ethereum is basically just a smart contract that follows some common rules — namely it implements a standard set of functions that all other token contracts share, such as transfer(address _to, uint256 _value) and balanceOf(address _owner).
+
+Internally the smart contract usually has a mapping, mapping(address => uint256) balances, that keeps track of how much balance each address has.
+
+So basically a token is just a contract that keeps track of who owns how much of that token, and some functions so those users can transfer their tokens to other addresses.
+
+Since all ERC20 tokens share the same set of functions with the same names, they can all be interacted with in the same ways.
+
+One example of this would be an exchange. When an exchange adds a new ERC20 token, really it just needs to add another smart contract it talks to. Users can tell that contract to send tokens to the exchange's wallet address, and the exchange can tell the contract to send the tokens back out to users when they request a withdraw.
+
+The exchange only needs to implement this transfer logic once, then when it wants to add a new ERC20 token, it's simply a matter of adding the new contract address to its database.
+------------------------------------------
+ERC721 tokens
+- Not interchangeable, unique tokens, each has unique ID
+- Suitable for crypto-collectibles like cryptokitties as each 'token' or kitty is supposed to be unique
+- Not divisible, can only transfer in whole units
+
+-------------------------------------------
+
+Ganache or TestRPC  (old name)
+
+-Local Test Network-
+..................
+
+-Strongly typed (even returned values from function needs to be typed)
+
+function getMessage() - function name
+public view - function type
+returns (string) - return types 
+{
+ return message;
+}
+
+common function types:
+1. Public - Anyone can call this function    - Can only use one per function
+2. Private - Only this contract can call this function   - Can only use one per function
+3. View - This function returns data and does NOT modify the contract's data
+4. Constant - Same as the one above
+5. Pure - Function will NOT modify or even read the contract's (storage) data (rarely used)
+- It is purely isolated on itself:
+function _multiply(uint a, uint b) private pure returns (uint) {
+  return a * b;
+}
+6. Payable - When someone call this function they need to send ether along
+If a function is not marked payable and you try to send Ether to it, the function will reject your transaction
+
+returns keyword is used after view/constant
+
+a function that modifies data CANNOT return a value - will only return transaction hash
+
+a getter function or a 'call' function
+1. cannot modify contract's data
+2. can return data
+3. runs instantly
+4. free to do
+
+a setter function or a 'transact' function
+1. can modify contract's data
+2. takes time to execute
+3. returns transaction hash (or called transaction id.. therefore, a setter function which changes data CANNOT return data back)
+4. cost money!
+
+a 'transact' function or rather a transaction (anything that changes data in the blockchain) will need miners help to solve the said transaction hash
+
+
+------------------------------------
+Types:
+-> int8, int16, int32, int40 ... int256 -- no decimal
+-> unit8, uint16 ... uint256 -- no decimal
+
+if specify 'int' is equal to 'int256'
+
+256 bits = 32 bytes. So an uint is 32 bytes
+
+Take a 2 bit integer for example, it can go from 0 to 3. Hence, 0 to 2^2 - 1.
+
+So a 32 bit integer will go from 0 to 2^32 - 1 (4294967295)
+
+-> fixed/ufixed -- number with decimal places
+-> address
+
+storage and operations cost ether
+usually contract are only for simple business logic
+
+--> fixed/dynamic array -- int[3] / int[] <-- blank means its dynamic
+--> bytes and string are special arrays. bytes is similar to byte[]. string is equal to bytes but does not allow length and index access. Use bytes instead of byte[].
+	-> Creating dynamic arrays with initial length in memory (function) can be done using the new keyword, for e.g. uint[] memory a = new uint[](7); where a.length will be 7
+
+	-> memory arrays must be created with a length argument (like above example). They currently cannot be resized like storage arrays can with array.push(), although this may be changed in a future version of Solidity.
+
+    function getArray() external pure returns(uint[]) {
+  // Instantiate a new array in memory with a length of 3
+      uint[] memory values = new uint[](3);
+      // Add some values to it
+      values[0]=1;
+      values[1]=2;
+      values[2]=3;
+      //values[3]=4; //--->this will throw during runtime
+      // Return the array
+      return values;
+    } 
+
+	-> It is possible to resize storage (contract state) array using .length but not memory array
+
+	-> hence, strings cannot be compared directly. But can compare as follows.
+function compareStrings (string a, string b) view returns (bool){
+       return keccak256(a) == keccak256(b);
+   }
+
+type cast: just put type as method.. uint(x), bytes(s).length etc
+
+--> Struct
+struct Car{
+  string make;
+  string model;
+  uint value;
+}
+..
+Similar to a class
+A struct is a type definition.
+Declaration:
+Car[] cars;
+Car car;
+
+Instantiation:
+Car car = Car({make:'1923',model:'cadbery',value:123});
+--need to initialize all value types, no need for reference types like mapping
+
+**lazier way, do not use if possible**
+Car car = Car('1923','cadbery',123);//this depends on the keys ordering of the struct definition. If the keys are re-ordered, the values would be wrongly instantiatied!
+
+--> Mappings - a collection of key value pairs with below properties
+- Keys are NOT stored. We cant get a list of keys from mappings, unlike javascript Object.keys(...).
+- Values are not iterable. We cant get all values from mappings with for loop etc, unlike javascript Object.values(...).
+- All values exist in mappings. Calling a mapping with a non-existant key will return the default value for that particular value type. e.g. '' for string, 0 for int ... etc
+- All mappings can do is single value lookup.
+
+mapping(address => bool) public approvers //<--- a series of approvers
+
+...
+approvers[msg.sender] = true //setting some address to true; must set to true coz by default the value exists as false
+
+mappings are unique, i.e. unlike array, you cannot 'push' the same mapping key twice. There exists only one unique key value pair.
+
+--> Time units
+now  --> stored in uint256
+seconds
+minutes
+hours
+days
+weeks
+years
+
+These wil convert to a uint, so 1 minutes = 60, 1 hours = 3600 etc
+When we are storing unit time, we have to take note. If we stored them in uint32, then the timestamps can only go up to year 2038.
+
+---------------------------------
+Returns:
+
+--> Any solidity code that returns (uint,unit....) a bunch of return values when called in web3 contract instance will return a Result { '0': .., '1': ...} object back
+
+--solidity is different from javascript in that it can returns a bunch of different values.
+It can also return the value when defined (in returns), hence no need the return keyword inside the function.
+
+function getKitty(uint256 _id) external view returns (
+    bool isGestating,
+    bool isReady,
+    uint256 cooldownIndex,
+    uint256 nextActionAt,
+    uint256 siringWithId,
+    uint256 birthTime,
+    uint256 matronId,
+    uint256 sireId,
+    uint256 generation,
+    uint256 genes
+) {
+    Kitty storage kit = kitties[_id];
+
+    // if this variable is 0 then it's not gestating
+    isGestating = (kit.siringWithId != 0);
+    isReady = (kit.cooldownEndBlock <= block.number);
+    cooldownIndex = uint256(kit.cooldownIndex);
+    nextActionAt = uint256(kit.cooldownEndBlock);
+    siringWithId = uint256(kit.siringWithId);
+    birthTime = uint256(kit.birthTime);
+    matronId = uint256(kit.matronId);
+    sireId = uint256(kit.sireId);
+    generation = uint256(kit.generation);
+    genes = kit.genes;
+}
+
+--> Another things to take note is, even though its returns (uint).. the actual type returned when called in web3 is of string.
+
+----------------------------------
+Gas saving:
+
+For uint types:-
+
+There's no savings for as Solidity reserves 256 bits of storage regardless of uint size. But inside a struct, a smaller-sized uint will allow Soildity to take lesser storage
+
+struct NormalStruct {
+  uint a;
+  uint b;
+  uint c;
+}
+
+struct MiniMe {
+  uint32 a;
+  uint32 b;
+  uint c;
+}
+
+// `mini` will cost less gas than `normal` because of struct packing
+NormalStruct normal = NormalStruct(10, 20, 30);
+MiniMe mini = MiniMe(10, 20, 30);
+
+You'll also want to cluster identical data types together (i.e. put them next to each other in the struct) so that Solidity can minimize the required storage space. For example, a struct with fields uint c; uint32 a; uint32 b; will cost less gas than a struct with fields uint32 a; uint c; uint32 b; because the uint32 fields are clustered together.
+
+---
+
+external view functions doest cost gas becuase it only needs to query 'local' Ethereum node without having to create a transaction on the blockchain (which would need to be run on every single node and cost gas)
+
+if view functions is called internally from another function, then it will still cost gas for that other function.
+
+---
+Storage is expensive:
+
+In most programming languages, looping over large data sets is expensive. But in Solidity, this is way cheaper than using storage if it's in an external view function, since view functions don't cost your users any gas. (And gas costs your users real money!).
+
+----------------------------------
+Events
+
+Solidity has 'event'. Something like EventEmitter which front end javascript can listen to..
+
+// declare the event
+event IntegersAdded(uint x, uint y, uint result);
+
+function add(uint _x, uint _y) public {
+  uint result = _x + _y;
+  // fire an event to let the app know the function was called:
+  IntegersAdded(_x, _y, result);
+  return result;
+}
+
+Your app front-end could then listen for the event. A web3 javascript implementation:
+
+cryptoZombies.events.NewZombie()
+.on("data", function(event) {//<--- notice the "data"
+  let zombie = event.returnValues;
+  // We can access this event's 3 return values on the `event.returnValues` object:
+  console.log("A new zombie was born!", zombie.zombieId, zombie.name, zombie.dna);
+}).on("error", console.error);
+
+---
+
+events can also have 'indexed' arguments, which make it 'filterable' when we are listening for changes. For e.g.
+
+in .sol:
+event Transfer(address indexed _from, address indexed _to, uint256 _tokenId);
+
+in js:
+// Use `filter` to only fire this code when `_to` equals `userAccount`
+cryptoZombies.events.Transfer({ filter: { _to: userAccount } })
+.on("data", function(event) {
+  let data = event.returnValues;
+  // The current user just received a zombie!
+  // Do something here to update the UI to show it
+}).on("error", console.error);
+
+**Up to three parameters can receive the attribute indexed which will cause the respective arguments to be searched for: It is possible to filter for specific values of indexed arguments in the user interface.
+
+-----
+
+We can query past events using getPastEvents and use the filters fromBlock and toBlock to give Solidity a time range for the event logs ("block" in this case referring to the Ethereum block number):
+
+cryptoZombies.getPastEvents("NewZombie", { fromBlock: 0, toBlock: "latest" })
+.then(function(events) {
+  // `events` is an array of `event` objects that we can iterate, like we did above
+  // This code will get us a list of every zombie that was ever created
+});
+
+Because you can use this method to query the event logs since the beginning of time, this presents an interesting use case: Using events as a cheaper form of storage.
+
+If you recall, saving data to the blockchain is one of the most expensive operations in Solidity. But using events is much much cheaper in terms of gas.
+
+The tradeoff here is that events are not readable from inside the smart contract itself. But it's an important use-case to keep in mind if you have some data you want to be historically recorded on the blockchain so you can read it from your app's front-end.
+
+For example, we could use this as a historical record of zombie battles — we could create an event for every time one zombie attacks another and who won. The smart contract doesn't need this data to calculate any future outcomes, but it's useful data for users to be able to browse from the app's front-end.
+
+-----------------------------------
+Storage vs memory
+Storage - holds data between function calls (For e.g. contract's variable)
+Memory - temporary place to store data (For e.g. arguments in a function by default) 
+	- any call to a solidity function with argument is assuming that the caller wants to make a copy of the parameter passed in. for e.g. 
+function somefunction() public{
+	...
+	changeArray(numbers)
+}
+
+function changeArray(int[] memory myArray) private{//the memory keyword is by default
+	myArray[0] = 1; //myArray is a new copy in memory
+	//if memory is changed to storage, any modification to myArray will modify numbers
+}
+
+
+A contract’s storage variables are the ones which define your contract’s state and are only changed by sendTransaction calls.
+
+memory variables are temporary variables that exist only inside the calling function (they cannot be declared outside of one). They get wiped after the function exits and they are generally cheaper to use than storage variables.
+
+The keyword storage vs memory in variable references:
+
+contract Numbers{
+	int[] public numbers;
+
+	function Numbers() public{
+		numbers.push(20);
+		numbers.push(32);
+
+		int[] storage myArray = numbers; //<--- if storage is used here, myArray will point to numbers in contract storage, any changes in myArray will affect numbers
+		//int[] memory myArray = numbers; //<--- if memory is used here, myArray will hold a separate copy of array in memory
+		myArray[0] = 1;
+	}
+}
+
+------------------------------------
+The Message Global Variable, 'msg' object:
+The global variable that we can check inside the contract to get some information about the sender(account) who calls or transacts with this contract.
+
+msg.data, msg.gas, msg.sender, msg.value
+
+---
+
+function gate keeper/validation logic: require(.. some logic)
+
+The require function should be used to ensure valid conditions, such as inputs, or contract state variables are met, or to validate return values from calls to external contracts. 
+
+There is also assert(...)
+
+assert is similar to require, where it will throw an error if false. The difference between assert and require is that require will refund the user the rest of their gas when a function fails, whereas assert will not (all gas will just be consumed AND the function failed). So most of the time you want to use require in your code; assert is typically used when something has gone horribly wrong with the code (like a uint overflow, i.e. for internal error checking only).
+
+---
+
+function modifiers:
+
+for repetitive (validation) logic, can use modifier as such:
+   function pickWinner() public restricted{
+	...
+	...
+	..some code..
+   }
+
+    modifier restricted(){
+        require(msg.sender == manager);
+        _;
+    }
+
+where 'some code' of the function pickWinner() can be think of as replaced into the underscore of the modified fuction; hence only run AFTER the require statement.
+
+A function modifier can also take arguments, passed in by the function itself:
+
+// A mapping to store a user's age:
+mapping (uint => uint) public age;
+
+// Modifier that requires this user to be older than a certain age:
+modifier olderThan(uint _age, uint _userId) {
+  require(age[_userId] >= _age);
+  _;
+}
+
+// We can call the `olderThan` modifier with arguments like so:
+function driveCar(uint _userId) public olderThan(16, _userId) {
+  // Some function logic
+}
+
+
+------------------------------------
+Contract Inheritance:
+
+contract Doge {
+  function catchphrase() public returns (string) {
+    return "So Wow CryptoDoge";
+  }
+}
+
+contract BabyDoge is Doge {
+  function anotherCatchphrase() public returns (string) {
+    return "Such Moon BabyDoge";
+  }
+}
+
+If compile and deploy BabyDoge, will have access to all the public functions of Doge.
+
+- Solidity uses import statement too.
+
+import "./someothercontract.sol";
+
+contract newContract is SomeOtherContract {
+
+}
+
+//Multiple inheritance is possible
+contract newContract is SomeOtherContract, SomethingElse {
+
+}
+
+More on function visibility!
+public private internal and external
+
+internal is the same as private, except that it is accessible to contracts that inherits from this contract
+
+external is same as public, except that these functions can ONLY be called OUTSIDE the contract.
+
+public vs external
+https://ethereum.stackexchange.com/questions/19380/external-vs-public-best-practices
+
+- external may help to save gas coz the arguments (call data) are not being copied into memory
+
+------
+Abstract Contracts and Interfaces:
+
+There are some differences between these two, but the common idea is that they are used as a 'base' without functions implementations where by the child contract will implement the functions. They are not compilable.
+
+If the child contract didn't implement ALL the functions, the child will be regarded as abstract contract as well.
+
+https://solidity.readthedocs.io/en/v0.4.24/contracts.html?highlight=interface#abstract-contracts
+
+------------------------------------
+Interface (NOT about inheritance, but about using OTHER contract's public method):
+
+contract NumberInterface {
+  function getNum(address _myAddress) public view returns (uint); //<-- this line defines an interface to a function inside another contract
+}
+
+//the getNum method has to be public in that other contract. To use it, we only need to know the contract address.
+
+contract MyContract {
+  address NumberInterfaceAddress = 0xab38... 
+  // ^ The address of the FavoriteNumber contract on Ethereum
+  NumberInterface numberContract = NumberInterface(NumberInterfaceAddress);
+  // Now `numberContract` is pointing to the other contract
+
+  function someFunction() public {
+    // Now we can call `getNum` from that contract:
+    uint num = numberContract.getNum(msg.sender);
+    // ...and do something with `num` here
+  }
+}
+------------------------------------
+Handling multiple assignments:
+
+function multipleReturns() internal returns(uint a, uint b, uint c) {
+  return (1, 2, 3);
+}
+
+function processMultipleReturns() external {
+  uint a;
+  uint b;
+  uint c;
+  // This is how you do multiple assignment:
+  (a, b, c) = multipleReturns();
+}
+
+// Or if we only cared about one of the values:
+function getLastReturnValue() external {
+  uint c;
+  // We can just leave the other fields blank:
+  (,,c) = multipleReturns();
+}
+
+------------------------------------
+
+Library:
+
+A library is a special type of contract in Solidity. One of the things it is useful for is to attach functions to native data types.
+
+for e.g. using SafeMath from OpenZeppelin
+
+contract SomeContract {
+  using SafeMath for uint256;
+
+  uint256 a = 5;
+  uint256 b = a.add(3); // 5 + 3 = 8
+  uint256 c = a.mul(2); // 5 * 2 = 10
+}
+
+------------------------------------
+
+Security (OR an idea about how hacker can steal your money!)
+
+For SSR compilation, we can use Infura's provider
+
+  const provider = new Web3.providers.WebsocketProvider(
+    'wss://rinkeby.infura.io/ws'
+  );
+  web3 = new Web3(provider);
+
+But this only allow for READ from blockchain. In order to WRITE to blockchain, user need to sign the transaction with their own public/private key pair.
+
+**Ethereum (and blockchains in general) use a public / private key pair to digitally sign transactions. Think of it like an extremely secure password for a digital signature. That way if I change some data on the blockchain, I can prove via my public key that I was the one who signed it — but since no one knows my private key, no one can forge a transaction for me.***
+
+SO, we usually use MetaMask (Or Mist.. or anything that can provide the window.web3 instance) provider in the BROWSER, such that the user's (account) address is available.
+
+  web3 = new Web3(window.web3.currentProvider);
+
+Coming back to security, if a hacker knows your private key, (s)he can use it to generate a public key and sign a transaction. The hacker may need to do it using JSON-RPC.. but I believe it's doable.
+
+------------------------------------
+//Comments in a format called natspec
+
+/// @title A contract for basic math operations
+/// @author H4XF13LD MORRIS 💯💯😎💯💯
+/// @notice For now, this contract just adds a multiply function
+contract Math {
+  /// @notice Multiplies 2 numbers together
+  /// @param x the first uint.
+  /// @param y the second uint.
+  /// @return z the product of (x * y)
+  /// @dev This function does not currently check for overflows //--> this one is dev note
+  function multiply(uint x, uint y) returns (uint z) {
+    // This is just a normal comment, and won't get picked up by natspec
+    z = x * y;
+  }
+}
+
+------------------------------------
+
+1 Ether = 1 000 000 000 000 000 000 Wei (Smallest unit of measurement)
+
+------------------------------------
+
+if not using Truffle Suite, need a boilerplate:
+
+1. Need solidity compiler to build our contracts
+2. Need mocha test runner to test Solidity code
+3. Need deploy script to compile and deploy contract
+
+
+1. solc (npm package) - will return the compiled bytecode and ABI
+
+ABI - just an array of functions and variables properties for javascript to interface
+
+2. Use mocha and assert (from nodejs)
+
+3. Web3 - to deploy and manipulate contracts with javascript
+
+ATTENTION:
+
+version v0.x.x - only callbacks fro async code
+version v1.x.x - support for promises + async/await
+
+------------------------------------
+
+Ganache local test network will auto create a series of unlocked test accounts (with account address, public and private key)
+
+------------------------------------
+
+Deployment to Rinkeby Test Network:
+
+Rinkeby Network (Nodes) <---> Infura Node (Infura API) ---> Provider <----- web3 <--- Web3
+							        ^
+								|
+								|
+							   Account Mnemonic
+
+Deployment to a network can be done via a local (real) node which is connected to the network, which requires a lot of effort to setup or can be done via Infura, the company that has provided the Infura Node and API to deploy to.
+
+--There are also modules which help to setup local node like geth or parity, but troublesome to setup
+
+Deployment to the real work network also requires the account mnemonic which contains ether
+
+The provider here will be using npm package: truffle-hdwallet-provider, to unlock the account
+
+------------------------------------
+
+Using remix.ethereum to deploy or manipulate contracts at Rinkeby Testnet:
+
+Remix has different environments:
+1. Javascript VM - local browser simulated testnet
+2. Injected Web3 - This allows me to deploy.. or retrieve (cum manipulate) deployed contract
+
+-----------------------------------
+
+Ideas about deploying real world apps:
+
+Create (& deploy beforehand) a 'factory' contract that is able to instantiate and deploy other contract instances. This factory contract also store a list of the contract instances' addresses.
+
+User and our server will interact with this factory contract.
+
+**Beware of global variables defined in the constructor like msg.sender. Because when the factory contract creates the contract instance, msg.sender's address will be the factory contract's address.
+------------------------------------
+Some definitions:
+
+gasPrice - Amount of Wei the sender is willing to pay per unit gas to get this transaction processed. for e.g. lets say an addition operation costs 3 gas units and sender is willing to pay 10 gasPrice. Means he is willing to pay 30 wei for this operation.
+
+startGas/gasLimit - Units of gas that this transaction can consume. i.e Whats the limit for gas unit that the sender is willing to pay for this transaction. 
+
+for e.g. gasPrice = 300 and gasLimit = 10 ===> sender willing to pay maximum 3000 wei for this transaction. But if the transaction requires more than 10 gas units as a whole, the network will stop the execution halfway when it hits the limit.
+
+-----------------------------------
+Gotchas-
+1.
+A public function is automatically created for a public variable of a contract, hence another public getter function would be superflous(duplicate).
+
+When an outsider calls the variable, is equivalent to calling the (auto generated) public getter function.
+
+A variable created without the public keyword is by default 'internal'. THUS, can be accessed by child contract!
+
+http://solidity.readthedocs.io/en/develop/contracts.html?#visibility-and-getters
+
+***Functions can be specified as being external, public, internal or private, where the default is public. For state variables, external is not possible and the default is internal.***
+
+2. As mentioned above, a 'transact' function cannot return data back. It returns the transaction hash.
+
+3. Every transaction takes time. But in remix.ethereum's development environment, it's instantanious. Need to take account this in real world application.
+
+4. In relation to 1., for array, the auto generated public variable getter function needs an index as argument to get the value for an element of the array. ELSE, it will default to returning the index 0 element.
+
+5. As of now, nested arrays not yet implemented (either as input argument type or return argument type) for call data in Solidity/ABI. And 'string' type is actually a dynamic array of bytes. Hence, doing below will have error / warning (experimental ABIencoder)
+
+function testString(string[] nested) public{
+
+}
+
+function testRetString() public view returns (string[]){
+
+}
+
+6. In addition to above, Solidity also cannot return an array of some other complex object types like Structs.
+
+--Internal / recursive type is not allow for public / external functions.
+
+Best workaround right now, is to get the total array length and request the array one by one.
+
+7. Confusing runtime error when using statement like require(..). But can refer to which function fails and use the remix debugger.
+
+8. Solidity has NO random number generator. So need to generate a pseudo random number generator. It's tough to do so.
+
+simple method: current block difficulty + current time + addresses of players -> sha3 algo -> big hexa number
+
+9. Metamask will always inject an instance of web3@^0.20 into the webpage (or even deprecate web3 from their app), but with the provider which contains the account info.
+So from javascript, we can don't care about Metamask and define the web3 instance for our own app as such:
+
+import Web3 from 'web3';
+const web3 = new Web(window.web3.currentProvider);//assigning Metamask web3 instance's provider to this web3
+
+10. Solidity's <address>.transfer(amt..) seems to NOT register as transaction(in etherscan or metamask)
+
+11. DO NOT use dynamic array and for loop! That can lead to unbound amount of gas cost for user! Use mappings instead.
+
+12. Internal transfer in Rinkeby testnet (i.e. using a contract to transfer some internal amount to an address) does not show up as transactions in/out in either accounts log.
+
+--->On Rinkeby, which is geth compatible we are currently not able to check for the "internal transactions" and as such wont be able to tell if all the sub transactions are correctly executed
+
+13. Do NOT use this.f() pattern, this will actually CALL the function and it would be expensive. All functions that need to be accessed in the contract or child contract should NOT be defined as external.
+
+14. Overflow and Underflow:
+
+uint8 number = 255;
+number++;
+//--> will become 0
+
+uint8 number = 0;
+number--;
+//--> will become 255
+
+solidary 'resets' when overflow or underflow, just like a clock.
+
+-----------------------------------
+Ethereum accounts mnemonic (to contain all accounts.. #1,#2,#3...):
+1.
+exchange slab erupt ankle decade power own trade lyrics volume refuse nasty
+
+These 12 words can be used to regenerate the same series of accounts.
+
+Infura access token: zrgEHIcGzfZ3LHNoemSE
+
+1st Contract address! 0xf136B73317220C2d3F9E610bd407144A4C0448D0
+2nd Contract (deployed from metamask) : 0x7832758cd53afa9ef90f3856a0aadf4b4bddb576
+3rd Contract: 0xa8AC9dBc0a112F0540909F000315254994A62A97
+
+campaign 1st Contract address: 0x94A88864Ea57ecF16cdE3d9Ee3CdBE4dcB829192
+2nd address: 0x9B7dF1716f9c7CCf747707177982bD96D66bF237
+
+The address is the hash of the last 20 bytes of the public key.
+
+Every account is defined by a pair of keys, a private key and public key. Accounts are indexed by their address which is derived from the public key by taking the last 20 bytes. Every private key/address pair is encoded in a keyfile.
+

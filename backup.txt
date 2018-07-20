@@ -1,0 +1,76 @@
+  @Effect()
+  authSignup = this.actions$
+  .ofType(AuthActions.TRY_SIGNUP)//<-- ofType is from Actions class, returning Action ofType ...
+  .map((action: AuthActions.TrySignup) =>{
+    console.log("auth actions try signup");
+    return action.payload;
+    //return Observable<payload:{username: string, password: string}>
+  })
+  .switchMap((authData: {username: string, password: string}) =>{
+    return fromPromise(
+      firebase.auth().
+      createUserWithEmailAndPassword(authData.username, authData.password)
+      .then(user => {this.router.navigate(['/'])})
+      // .catch(
+      //     err => {
+      //       console.log("sign up error "+ err.message);
+      //       // Observable.of({type:AuthActions.SIGNUP_FAIL})
+      //       return 'failed';
+      //     }
+      //
+      // )
+    )
+    //return the Observable<user object/ response>
+  })
+  // .catch((err)=>{
+  //   if(err){
+  //     console.log("sign up error "+ err.message);
+  //     throw err;
+  //   }
+  //   return Observable.of<any>([]);
+  // })
+  .switchMap((input)=>{
+
+      console.log("switch map 2 called, whats the input when correct/err? " + input);
+      return fromPromise(firebase.auth().currentUser.getIdToken()
+            .catch(
+              err => {
+                console.log("signup - getting ID token error "+ err.message);
+              }
+            ));
+
+    //return Observable<token>
+    }
+  )
+  .mergeMap((token: string)=>{
+      console.log("merge map called "+token);
+      return [
+        {
+          type: AuthActions.SIGNUP //<--dispatch to change state to authorized
+        },
+        {
+          type:AuthActions.SET_TOKEN,//<-dispatch to set token
+          payload: token
+        }
+      ] //<--2 observableS are returned here by 'MergeMap', effectively dispatching 2 'effects'
+      //<-- @Effect will take care of these and dispatch the 2 actions accordingly
+      //The last step of dispatching observable<action> via map alone or observable<action>s via mergeMap
+      //is required by @Effect()
+      //unless @Effect({dispatch:false})
+    }
+  // ,
+  // err=>{
+  //   console.log("error propagated to here "+err);
+  //   return {
+  //     type: AuthActions.SIGNUP_FAIL
+  //   }
+  // }
+  ).catch((err)=>{
+    if(err){
+      console.log("mergeMap error "+ err.message);
+
+      return Observable.of({type: AuthActions.SIGNUP_FAIL})
+
+    }
+    return Observable.of<any>([]);
+  });

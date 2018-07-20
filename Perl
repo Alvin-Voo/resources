@@ -1,0 +1,68 @@
+cpan -l to list all installed modules
+
+cpanm Module::Name --sudo to install module to user share directory
+cpanm -U Module::Name to uninstall
+
+1. Perl metacharacters, that must be escaped by '\' or use metaquote (function)
+{}[]()^$.|*+?\
+
+2. Must specify encoding when reading or writing files
+open my $fh, '<:utf8', 'thorninmyback.txt';
+open my $fh, '>:utf8', 'thorninmyback.txt';
+
+3. variable with a 0 infront is in octal format
+my $var = 033;
+print $var; #is 27
+
+4. Perl abbreviation
+*   \d is a digit and represents
+
+            [0-9]
+
+*   \s is a whitespace character and represents
+
+    [\ \t\r\n\f]
+
+*   \w is a word character (alphanumeric or _) and represents
+
+    [0-9a-zA-Z_]
+
+*   \D is a negated \d; it represents any character but a digit
+
+    [^0-9]
+
+*   \S is a negated \s; it represents any non-whitespace character
+
+    [^\s]
+
+*   \W is a negated \w; it represents any non-word character
+
+    [^\w]
+
+*   The period '.' matches any character but "\n"
+
+5. TO invoke a perl program from shell
+include #!/usr/bin/perl in file
+
+6. Background for reference in Perl 5
+Perl design for Hash: Hash Values must be scalars
+
+But a single reference can refer to an
+entire array, and references are scalars, so you can have a hash of
+references to arrays
+
+7. $" => List Separator, by default is a space
+
+8. Reference declaration syntax
+[] - array
+{} - hash
+
+Invoke function reference with ->()
+
+9. Dumping printout of complex data structure
+use Data::Dumper; print Dumper(...);
+use YAML::XS; print Dump(...);
+
+
+
+

@@ -1,0 +1,119 @@
+install virtualenv
+1. pip install --user virtualenv
+
+----------
+=>Create and activate virtualenv
+
+create virtualenv
+1. virtualenv *env name*
+
+activate virtual env
+1. source *env name folder*/bin/activate
+
+-----------
+=>Installing Django and creating a new project
+
+install Django via Pip
+1. pip install Django
+
+create a new project in Django
+1. django-admin.py startproject *proj name* . (currect proj dir)
+
+-----------
+=> Create the database
+
+1. python manage.py migrate
+-check that db.sqlite3 is created after that
+
+------------
+start/create a new app, a project can have a few apps work together
+1. python3 manage.py startapp "app name"
+2. check the corresponding folder and files are created.
+
+------------
+
+Whenever we want to modify data model in Django:
+1. modify models.py
+2. call makemigrations: python3 manage.py makeigrations *project name* ==> Create the "model init'.py file
+3. call migrate: python3 manage.py migrate ==> apply said file to the project
+
+To register models with admin site (do this after migration):
+1. in admin.py, from *proj*.models import *Model*
+2. admin.site.register(*Model*)
+
+To activate app:
+1. include 'app name' in settings.py under INSTALLED_APPS = (..)
+
+------------
+
+setting up a superuser ==> to access admin page
+1. python3 manage.py createsuperuser
+
+to delete all data/reset database
+1. python3 manage.py flush
+
+------------
+
+To open Django shell:
+1. python3 manage.py shell
+
+To start the server
+python3 manage.py runserver (optional:port number, default is 8000)
+
+Check settings.py for 'TEMPLATES' settings, make sure DIRS is set:
+        'DIRS': [
+             os.path.join(BASE_DIR, 'templates'), 
+         ],
+
+-------------
+
+Building pages: Define model -> Specify URL pattern -> write view function -> write template
+
+--------------
+Django structure: urls, model, view, template (front page - html/php)
+Proj folder:
+urls - default urls 
+settings - adding installed apps
+
+Proj folder/own app folder:
+views
+admin
+model
+
+Proj folder/own app folder/template folder(need to create thy self)/"own app folder"/:
+index.html
+
+-------------
+While turning DEBUG off, Django won't handle static files anymore. The production web server should handle that.
+
+In local production, can run with python3 manage.py runserver --insecure to debug
+
+k3$h@1$d@b0mb
+
+-------------
+How to test local gunicorn server:
+
+ensure Procfile is there pointing to the correct wsgi
+
+launch local gunicorn instance: heroku local
+
+
+-------------
+heroku ps -> to check status and quota
+heroku run *something* -> to run on said environment in heroku
+ie. heroku run bash
+
+
+-------------
+reset git remote after heroku app is destroyed, i.e.
+git remote set-url heroku https://git.heroku.com/polar-cove-4803.git
+
+--------------
+Test aws s3 connection:
+in the environment, activate python in local env
+import boto3
+client = boto3.client('s3',aws_access_key_id='AKIAJZTCLBXKCLXMCJZA',aws_secret_access_key='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')
+response = client.list_buckets()
+response['Buckets']
+
+

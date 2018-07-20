@@ -1,0 +1,81 @@
+Parent Element (Container):
+
+The flex container becomes flexible by setting the display property to 'flex':
+.flex-container {
+	display: flex;
+}
+
+*other properties of flex container are:
+flex-direction - column, column-reverse, row, row-reverse
+flex-wrap - wrap, nowrap, wrap-reverse
+flex-flow - shorthand for flex-direction & flex-wrap
+justify-content (align the flex items horizontally) - center, flex-start, flex-end, space-around, space-between
+align-items (align flex items vertically) - center, flex-start, flex-end, stretch(default), baseline (align items by their 'baseline')
+align-content (align the flex lines) - space-between, space-around, stretch(default), center, flex-start, flex-end
+
+perfect centering => justify-content: center; align-items: center
+
+
+Child Elements (Items)
+The direct child elements of a flex container automatically becomes flexible (flex) items.
+
+*properties of a flex item are:
+order - specifies the order of flex items
+flex-grow - specifies how much a flex item will grow relative to the rest of the flex items. (i.e. how many fraction bigger is this item relative to the rest)
+flex-shrink - specifies how much a flex item will shrink relative to the rest of the flex items. (i.e. how many fraction smaller is this item relative to the rest)
+flex-basis - specifies the initial length of a flex item.. the rest will be relative to it.
+flex - shorthand property for the flex-grow, flex-shrink, and flex-basis properties.
+align-self (specifies the vertical alignment for the selected item inside the flexible container. overrides the default alignment set by the container (parent)'s align-items property) - center, flex-start, flex-end
+
+---------------------------
+
+Angular Flex - combined the static flexbox css with responsive api - mediaQuery (like bootstrap)
+
+API for DOM containers (parents), this will affect the children elements
+
+fxLayout="<direction> [wrap]" - row | column | row-reverse | column-reverse
+fxLayoutAlign="<main-axis> <cross-axis>" - main-axis: start | center | end | space-around | space-between; cross-axis: start | center | end | stretch
+fxLayoutGap="% | px | vw | vh"
+
+API for DOM elements (children)
+
+fxFlex	"" | px | % | vw | vh | <grow> <shrink> <basis>
+fxFlexOrder	int
+fxFlexOffset	% | px | vw | vh --- margin-left offset
+fxFlexAlign	start | baseline | center | end --- for cross-axis
+fxFlexFill, fxFill
+
+API for any elements
+
+fxHide	TRUE | FALSE | 0 | ""
+fxShow	TRUE | FALSE | 0 | ""
+ngClass	@extends ngClass core - added breakpoints ability
+ngStyle	@extends ngStyle core - added breakpoints ability
+imgSrc	@extends  src attribute - added breakpoints ability
+
+Any of these API can be appended with breakpoint aliases below:
+breakpoint	mediaQuery
+xs	'screen and (max-width: 599px)'
+sm	'screen and (min-width: 600px) and (max-width: 959px)'
+md	'screen and (min-width: 960px) and (max-width: 1279px)'
+lg	'screen and (min-width: 1280px) and (max-width: 1919px)'
+xl	'screen and (min-width: 1920px) and (max-width: 5000px)'
+lt-sm	'screen and (max-width: 599px)'
+lt-md	'screen and (max-width: 959px)'
+lt-lg	'screen and (max-width: 1279px)'
+lt-xl	'screen and (max-width: 1919px)'
+gt-xs	'screen and (min-width: 600px)'
+gt-sm	'screen and (min-width: 960px)'
+gt-md	'screen and (min-width: 1280px)'
+gt-lg	'screen and (min-width: 1920px)'
+
+----------------------------
+CSS:
+auto property
+The value of said property is adjusted automatically according to the content or the context of the element.
+
+For example, a block-level element with height: auto will grow taller as it contains more text. For another example, a block element with margin: 0 auto will have the left and right margins increased until it becomes centered along the y-axis of the viewport.
+
+It really depends on the property you give the value to, different properties behave differently depending on the content and context.
+
+

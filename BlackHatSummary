@@ -1,0 +1,50 @@
+----------------------
+(Python)Networking Basics:
+1. TCP & UDP Client
+2. Netcat - Read/Write data around network. Most easy swiss army tool.
+3. TCP proxy - Traffic can be sniffed, redirected when you are the middle man.
+4. Use paramiko to build a custom SSHv2 enabled server/client module
+5. SSH tunneling/forwarding/reverse tunneling - To enabled certain web service access (from a server you have access to) to be redirected to your machine via an unauthorized(unblocked) port
+----------------------
+Packet sniffer:
+1. Spread UDP packets across subnet addresses. Check if any ICMP responses.
+By default, windows will block outgoing ICMP unreachable messages.
+Windows Firewall has a mechanism named Stealth mode, which helps prevent malicious users from discovering information about network computers and the services that they run. When disabled, ICMP will respond.
+2. Scapy - to sniff packets (on a local host). Scapy has a nice command line interface (shell) for easy testing.
+3. ARP poisoning (page 59) - Spoof the ARP cache of both target and the gateway. a. tell the target that your machine is the src of ip b. tell the gateway that your machine is the src of ip. "arp -a" on the target machine will show that the gateway hw/MAC address is changed to yours. Sniff the target ip for packets.
+...
+The attacker may choose to inspect the packets (spying), while forwarding the traffic to the actual default destination to avoid discovery, modify the data before forwarding it (man-in-the-middle attack), or launch a denial-of-service attack by causing some or all of the packets on the network to be dropped.
+
+------------------------
+Web hackery:
+1. Brute-Forcing directorys in a web/file server - page 72
+2. Brute-Forcing form login authentication - page 76
+3. Use Burp suite to send fuzzing requests - page 84
+
+------------------------
+Use GitHub as a Command and Control:
+1. GitHub can be used store configuration settings, custom modules and output data of trojan in target machine
+2. Python import can be hacked to import customly written modules by a function(s)
+
+What trojans do? - A section of malware program which is hiding in a larger chunk of code
+1. Keylogging - Page 116
+2. Taking screenshots - Page 119
+3. Execute shellcode
+4. Exfiltrating local documents (to a public site - so that's not tracable)
+
+Man in Browser attack:
+1. Manipulate browser process to monitor or steal sensitive information
+2. Can be injected through Browser Helper Objects/Addons/Extensions
+
+How to gain access to a system:
+1. Exploit known vulnerability of running processes
+	- Through privilege escalation - page 146
+	- Temporary file which are readable & writable created by privilege processes can be used to inject executable code - Page 152
+2. Password cracking
+	- i.e. for VM, can obtain password through password hash (Volatility to access windows dumps) - Page 158
+3. Phishing
+	- Tempting user to unknowingly install/execute malware
+
+Direct Code Injection
+1. Can do this by overwriting the *vmem file for a suspended Windows(or any OS) of VM player. Overwriting null sections with executable malware code and injecting a 'jumping' point in a target software (like calc.exe) provided you can get the entry address to one of the buttons/interaction point.
+

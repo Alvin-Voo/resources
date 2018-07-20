@@ -1,0 +1,10 @@
+swallow the error and switch over to a backup Observable to continue the sequence
+swallow the error and emit a default item
+swallow the error and immediately try to restart the failed Observable
+swallow the error and try to restart the failed Observable after some back-off interval
+
+
+
+RxJS is internally wrapping code in operators (like map, filter, etc) with a try / catch. If an error is caught, it will notify subscribers, and then unsubscribe the stream. This is hard coded — you have no choice!
+If an error is thrown within an operator, the stream will always complete.
+

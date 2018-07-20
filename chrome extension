@@ -1,0 +1,47 @@
+Chrome extension contains
+
+- a manifest.json
+- a background.js script
+  -- The background script is the extension's event handler; it contains listeners for browser events that are important to the extension. It lies dormant until an event is fired then performs the instructed logic. An effective background script is only loaded when it is needed and unloaded when it goes idle.
+
+- a popup.html page (in browser action or page action)
+- a popup.js script for html page ---> can inject contentscript.js into the webpage itself which read and modify the DOM of web pages the browser visits.
+- addtionally can include 'options_page' for user's further configuration
+- options page make use of html and js as well
+- content scripts - scripts that can be injected to a webpage to manipulate DOM and send data back to the parent extensions. Content scripts cannot interfere with webpage script, they are each existing in what called isolated worlds.
+
+browser actions should be used for features that make sense on MOST page; while page actions the opposite. An extension using a page action and a popup can use the declarative content API to set rules in the background script for when the popup is available to users.
+
+
+installed chrome extensions in linux: /home/alvinvoo/.config/chromium/Default/Extensions/*id*
+
+
+------
+content scripts:
+
+use programmtic OR declarative injection
+
+[webpage]             <--send/receive messages-->  [extension]
+inject						
+content.js
+
+use 					use chrome.runtime.onMessage.addListener
+chrome.runtime				& chrome.tabs.sendMessage(tabs[0].id,..)
+.onMessage.addListener(..)
+&
+chrome.runtime
+.sendMessage(..)
+
+to receive/send messages
+
+https://developer.chrome.com/extensions/messaging
+
+HOW TO SOLVE THE unreachable WINDOW object??
+
+->Content scripts execute in a special environment called an isolated world. They have access to the DOM of the page they are injected into, but not to any JavaScript variables or functions created by the page.
+
+
+
+
+
+

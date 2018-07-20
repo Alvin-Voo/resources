@@ -1,0 +1,156 @@
+******************************************
+TIPS:
+1.if want to flipped image using sprite.scale =-1 and anchor is (0.5,1) where the axis is in the image's middle point, 
+make sure the body.setSize(x,y,width,height)'s x starting point is at the image's 25% mark so that the image can be 'flipped horizontally'
+without a radical offset to the position.x (still maintain the bounding box position at about the same area). Else, there will be issue with tilemap collsion when there's multiple user input flipping the image left and right.
+OR can experiment with setting the offset and width until it doesnt "fell" into the tilemap
+
+2.bounding box.. should be think differently (unassociated) with animation
+
+3.In multiarrays, always think of tilemap[y][x] because first access col then access row
+
+4.If Phaser is set in Scalemode RESIZE
+Then each time the browser resizes it will call Phaser.State.resize(width, height) , passing in the new width and height.
+
+5. Can force screen orientation, but only in mobile
+game.scale.forceOrientation(true) ;
+
+6. game.physcis.p2.enable("sprite name",[debug]);
+can turn on visual debugger directly!
+
+7. when clearing shapes and resetting them using setShape(...) methods, the anchor by default is (0.5,0.5), better pass in the correct x,y point instead of adding
+offsets in the setShape(..) method coz the collision will screw up with offsets. Unless the said object is just a static for obstacles.
+
+
+******************************************
+game.add.tween(someobj).to({x:'-200'},800);
+move x to the left 200 pixels relative to this x
+
+game.add.tween(someobj).to({x:-200},800);
+move x to position -200
+
+same principle applies to all other properties of someobj inside the curly bracket
+
+*******************************************
+Phaser states flow in full:
+var samplestate={
+	init(){},
+	preload(){},
+	create(){},
+	update(){},
+	shutdown(){}
+}
+
+*******************************************
+Phaser.Math.distance(this.x,this.y,that.x,that.y)..
+
+x and y are based on the bounding box top-left corner
+
+*******************************************
+Physics engine:
+Arcade- Basic, AABB, fixed rectangular bounding  box, aligned to axis
+P2 - More complex shapes are available - circles, planes, rectangles, capsules and convex polygons, dont need to aligned to axis, process collision by default
+	=> Can use PhysicsEditor for more natural shape and import as a JSON object
+		-body.loadPolygon shape
+	=> Max number of collision groups is limited to 31 in Phaser
+
+Ninja - sloped tiles and wall running
+Box2D ($25 usd plugin) - joints.. everything
+
+*******************************************
+2 common types of prefabs:
+UI (usually extend a group)
+game object (extend a sprite)
+
+use game.add.existing(prefab instance).. to add existing display object to the world
+
+*******************************************
+Phaser.Group.setAll(key, value [, checkAlive] [, checkVisible] [, operation] [, force])
+=>Quickly set the same property across all children of this group to a new value...
+=>can set some static values for prefab objects without declaring beforehand
+
+*******************************************
+page 191-this.map.createFromObjects(...) => create objects from tilemap layer, can create (not only with sprite) but with custom class as well
+to clear all current state (calling shutdown method) before moving to next level => Phaser.game.state.clearCurrentState();
+*******************************************
+Animation knowledge:
+Ease in - start slow & speed up to max speed
+Ease out - start fast in max speed & slow the motion to end
+Alpha 1 = full opacity
+Alpha 0 = transparent
+
+Linear => is first on the list because it is technically not an ease. Instead, a
+linear tween is just the interpolation without any slowing near the start or
+the stop. Instead of writing in or out for the easing, the easing command is
+“Phaser.Easing.Linear.None.”
+
+Back => eases will provide some “anticipation” of the motion by briefly
+moving in the opposite direction of the ease, effectively overshooting or
+winding up the motion.
+
+Bounce => eases will hit their intended destination early and then bounce
+three times as if someone had dropped a basketball onto a floor. Can be a
+bit too animated, use with caution.
+
+Circular => eases have a particularly long application time, taking until near
+the end of the animation to get to full speed. Great for very subtle motion
+that still looks organic.
+
+Elastic => is similar to a back ease. The animation will overshoot its final
+destination and have to correct back on the last few frames. If used
+sparingly, it can be a nice effect.
+
+Exponential easing is a very quick motion into or out of the full speed of
+the animation.
+
+Cubic, Quadratic, Quartic, and Quintic => are placed together because
+they are all technically the same idea, just more powerful versions of
+each. They’re less extreme versions of exponential but still provide a
+strong ease into or out of the motion.
+
+Sinusoidal => is one of the “smoother” eases, like circular. Very subtle,
+though it can feel a bit slow.
+
+When in doubt, exponential or quadratic are great default easing
+functions.
+
+*******************************************
+Everything in the game is an extension of Phaser.State
+https://photonstorm.github.io/phaser-ce/Phaser.State.html#State
+
+Any phaser objects like states and sprite etc can refer back to Phaser.Game object by this.game.(...)
+
+*******************************************
+workflow for now:
+Yeoman - generator templates to make project skeleton workflow in one go
+
+grunt & gulp - automation systems - to manage the whole workflow, from coding, watching, building, startin server, all configuration in a file
+grunt - run on configuration json like file
+gulp - run on javascript code
+
+babelify - transpile code from ES 6+ JS to ES 5 the more common accepted standard
+browserify - to wrap all separate js file into the final app.js, when debug option is true, will create source-map, so that can debug in browser console with reference to the original source file.
+
+bower - to install libraries , more for dependencies managemant at client side (use in conjunction with grunt)
+- bower_components folder
+
+
+grunt modules:
+
+('grunt-contrib-connect')
+('grunt-contrib-watch')
+('grunt-browserify')
+('grunt-contrib-copy')
+('grunt-contrib-uglify')
+('grunt-contrib-clean')
+('main-bower-files') - copy the main files
+
+********************************************
+https://cocoon.io
+For a project:
+Option: compile 'custom' dev app tailor to that specific project - if need special plugins etc
+Else, use the default dev app from the google play store
+
+
+
+ 
