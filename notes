@@ -12,6 +12,7 @@ sudo apt-get --purge autoremove (to remove obsolete dependencies)
 OR straight:
 sudo apt-get --purge autoremove *software name*
 5. To clear PPA source *cfg* list such that the same software no overlaps
+sudo add-apt-repository -r ppa:..  (WITH R option)
 sudo rm /etc/apt/sources.list.d/*list*
 sudo rm /etc/apt/trusted.gpg.d/*gpg*
 6. How to clone from Git Hub

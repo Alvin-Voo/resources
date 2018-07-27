@@ -40,8 +40,35 @@ HOW TO SOLVE THE unreachable WINDOW object??
 
 ->Content scripts execute in a special environment called an isolated world. They have access to the DOM of the page they are injected into, but not to any JavaScript variables or functions created by the page.
 
+Since this injected js file is being loaded via a chrome-extension: URL from within the DOM, "script.js" must be added to the web_accessible_resources section of the manifest file. Otherwise Chrome will refuse to load the script file.
+
+**?
+You should run as little logic as possible in the web page, and handle most of your logic in the content script. This has multiple reasons. First and foremost, any script injected in the page runs in the same context as the web page, so the web page can (deliberately or inadvertently) modify JavaScript/DOM methods in such a way that your extension stops working. Secondly, content script have access to extra features, such a limited subset of the chrome.* APIs and cross-origin network requests (provided that the extension has declared permissions for those).
+
+->Popup.js is refreshed everytime the extension icon is clicked BUT background script is NOT (unless the extension is refresh/redeployed).
+
+---> only supports chrome.runtime.. there's NO chrome.tabs in content script!
+
+
+
+-------------------------
+Redux for chrome extension:
+
+To store persistent store state in the background.js. Use react-chrome-redux.
+
+https://github.com/tshaddix/react-chrome-redux
 
 
 
 
 
+
+
+
+
+
+
+
+
+
+*** use 'storage explorer' extension to manage storage area of chrome extension. (Therefore, its not secure)
