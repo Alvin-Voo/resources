@@ -804,6 +804,8 @@ string cannot be indexed due to their arbitary length.
 
 16. web3.utils._  --> uses underscore.js... very similar to lodash. But lodash is said to be more superior.
 
+17. There's NO explicit benefit of using the 'reason string' in a require statement, it only helps in debugging using tools like remix. From front end, the returned 'reason string' are STILL NOT accessible yet.
+
 -----------------------------------
 Ethereum accounts mnemonic (to contain all accounts.. #1,#2,#3...):
 1.

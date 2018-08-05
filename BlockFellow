@@ -1,0 +1,50 @@
+Proof of work
+
+A proof of work is a piece of data which is difficult (costly, time-consuming) to produce but easy for others to verify and which satisfies certain requirements. Producing a proof of work can be a random process with low probability so that a lot of trial and error is required on average before a valid proof of work is generated. 
+
+The most widely used proof-of-work scheme is based on SHA-256.
+
+SHA-256 produces hash of data one way.
+
+Let's say the base string that we are going to do work on is "Hello, world!". Our target is to find a variation of it that SHA-256 hashes to a value beginning with '000'. We vary the string by adding an integer value to the end called a nonce and incrementing it each time. Finding a match for "Hello, world!" takes us 4251 tries (but happens to have zeroes in the first four digits):
+
+"Hello, world!0" => 1312af178c253f84028d480a6adc1e25e81caa44c749ec81976192e2ec934c64
+"Hello, world!1" => e9afc424b79e4f6ab42d99c81156d3a17228d6e1eef4139be78e948a9332a7d8
+"Hello, world!2" => ae37343a357a8297591625e7134cbea22f5928be8ca2a32aa475cf05fd4266b7
+...
+"Hello, world!4248" => 6e110d98b388e77e9c6f042ac6b497cec46660deef75a55ebc7cfdf65cc0b965
+"Hello, world!4249" => c004190b822f1669cac8dc37e761cb73652e7832fb814565702245cf26ebb9e6
+"Hello, world!4250" => 0000c3af42fc31103f1fdc0151fa747ff87349a4714df7cc52ea464e12dcd4e9
+https://en.bitcoin.it/wiki/Proof_of_work
+
+----------------
+
+Merkle tree
+
+In Bitcoin, the header of a block contains the Merkle tree which is formed from all the transactions. The Merkle root is calculated from the transactions building up (https://en.bitcoin.it/wiki/Protocol_documentation#Merkle_Trees)
+
+The merkle tree is to make large amounts of data more manageable to process.
+
+Advantages of a merkle tree structure include:
+
+    Easy to check if transactions have been tampered with
+	- It can concluded that if the merkle root were ever to change, one or more transactions 	must have been tampered with.
+    Uses fewer resources
+    Easy to verify if a specific transaction has been added to the block
+	- Transversing the merkle tree is much faster and easier to check if a transaction has been 		included in a block
+https://www.mycryptopedia.com/merkle-tree-merkle-root-explained/
+
+-----------------
+Proof of stake
+
+With Proof of Work, the probability of mining a block depends on the work done by the miner (e.g. CPU/GPU cycles spent checking hashes).
+With Proof of Stake, the resource that's compared is the amount of Bitcoin a miner holds - someone holding 1% of the Bitcoin can mine 1% of the "Proof of Stake blocks". 
+
+https://en.bitcoin.it/wiki/Proof_of_Stake
+
+-----------------
+
+Memory-hard ==> Proof of X algorithm that needs MORE memory everytime the difficulty increases. As memory cost more money (than CPU), it is supposed to make it much more difficult to generate the bitcoins (or any altcoins), as increasing memory space required for the proof-of-x algorithm reduces the mining speed, and makes it harder for any one user or group of users to dominate the blockchain. 
+
+
+
