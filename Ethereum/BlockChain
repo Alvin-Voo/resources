@@ -10,9 +10,9 @@ Ethereum nodes communicate with a language called JSON-RPC. Web3.js handles all 
 
 (For Developers)web3.js --> Ethereum Networks <-- (For Consumers)metamask, mist browser
 
-Metamask 
+Metamask
 -Account Address  --hexadecimal string
--Public Key (same like a machine?) --hexadecimal string 
+-Public Key (same like a machine?) --hexadecimal string
 -Private Key (same like a machine?) --hexadecimal string
 
 One account interacts with all networks
@@ -84,7 +84,7 @@ A contract account can only exists in one network internally per se. It can be d
 
 A contract is instantiated/deployed (as contract instance/contract account) in a network.
 ---------------------------------------
-A contract is essential a transaction (has transaction's components) but without the 'to' field and has the bytecode of the contract in the 'data' field. 
+A contract is essential a transaction (has transaction's components) but without the 'to' field and has the bytecode of the contract in the 'data' field.
 
 When a transaction is transferred to network without a 'to' field, it will be instantiated as a contract with empty data.
 
@@ -124,7 +124,7 @@ Solidity
 ByteCode	   Application Binary Interface(ABI)
  |		     		|
  V		     		V
-Deploy 	    		      Web3 (Library that provides Javascript 
+Deploy 	    		      Web3 (Library that provides Javascript
  |				with programatic access to the contract/blockchain)
  |				|
  |				|
@@ -165,7 +165,7 @@ Ganache or TestRPC  (old name)
 
 function getMessage() - function name
 public view - function type
-returns (string) - return types 
+returns (string) - return types
 {
  return message;
 }
@@ -248,7 +248,7 @@ usually contract are only for simple business logic
       //values[3]=4; //--->this will throw during runtime
       // Return the array
       return values;
-    } 
+    }
 
 	-> It is possible to resize storage (contract state) array using .length but not memory array
 
@@ -443,8 +443,8 @@ For example, we could use this as a historical record of zombie battles — we c
 -----------------------------------
 Storage vs memory
 Storage - holds data between function calls (For e.g. contract's variable)
-Memory - temporary place to store data (For e.g. arguments in a function by default) 
-	- any call to a solidity function with argument is assuming that the caller wants to make a copy of the parameter passed in. for e.g. 
+Memory - temporary place to store data (For e.g. arguments in a function by default)
+	- any call to a solidity function with argument is assuming that the caller wants to make a copy of the parameter passed in. for e.g.
 function somefunction() public{
 	...
 	changeArray(numbers)
@@ -485,7 +485,7 @@ msg.data, msg.gas, msg.sender, msg.value
 
 function gate keeper/validation logic: require(.. some logic)
 
-The require function should be used to ensure valid conditions, such as inputs, or contract state variables are met, or to validate return values from calls to external contracts. 
+The require function should be used to ensure valid conditions, such as inputs, or contract state variables are met, or to validate return values from calls to external contracts.
 
 There is also assert(...)
 
@@ -568,7 +568,7 @@ https://ethereum.stackexchange.com/questions/19380/external-vs-public-best-pract
 
 - external may help to save gas coz the arguments (call data) are not being copied into memory
 
-Functions can be specified as being external, public, internal or private, where the default is PUBLIC. 
+Functions can be specified as being external, public, internal or private, where the default is PUBLIC.
 For state variables, external is not possible and the default is INTERNAL.
 
 ------
@@ -590,7 +590,7 @@ contract NumberInterface {
 //the getNum method has to be public in that other contract. To use it, we only need to know the contract address.
 
 contract MyContract {
-  address NumberInterfaceAddress = 0xab38... 
+  address NumberInterfaceAddress = 0xab38...
   // ^ The address of the FavoriteNumber contract on Ethereum
   NumberInterface numberContract = NumberInterface(NumberInterfaceAddress);
   // Now `numberContract` is pointing to the other contract
@@ -748,7 +748,7 @@ Some definitions:
 
 gasPrice - Amount of Wei the sender is willing to pay per unit gas to get this transaction processed. for e.g. lets say an addition operation costs 3 gas units and sender is willing to pay 10 gasPrice. Means he is willing to pay 30 wei for this operation.
 
-startGas/gasLimit - Units of gas that this transaction can consume. i.e Whats the limit for gas unit that the sender is willing to pay for this transaction. 
+startGas/gasLimit - Units of gas that this transaction can consume. i.e Whats the limit for gas unit that the sender is willing to pay for this transaction.
 
 for e.g. gasPrice = 300 and gasLimit = 10 ===> sender willing to pay maximum 3000 wei for this transaction. But if the transaction requires more than 10 gas units as a whole, the network will stop the execution halfway when it hits the limit.
 
@@ -853,4 +853,3 @@ campaign 1st Contract address: 0x94A88864Ea57ecF16cdE3d9Ee3CdBE4dcB829192
 The address is the hash of the last 20 bytes of the public key.
 
 Every account is defined by a pair of keys, a private key and public key. Accounts are indexed by their address which is derived from the public key by taking the last 20 bytes. Every private key/address pair is encoded in a keyfile.
-
