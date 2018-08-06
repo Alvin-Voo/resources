@@ -50,6 +50,53 @@ You should run as little logic as possible in the web page, and handle most of y
 ---> only supports chrome.runtime.. there's NO chrome.tabs in content script!
 
 
+------------------------
+Beware of injected script. 
+Since websites will use Content Security Policy and disallow 'eval(...)' or similar 'Function(...)' statements, the build output of webpack will not able to make it.
+
+statements like:
+r = function() {
+        return this
+    }() || Function("return this")();
+
+need to be replaced with 
+
+r = (function() { return this ? this : typeof self !== 'undefined' ? self : undefined})() || Function("return this")();
+
+THE PROBLEM:
+
+is with global variable, r IS global
+
+found
+~/Ethereum/node_projects/domainion/node_modules/web3-core-requestmanager$ grep -inr "web3.currentProvider.sendAsync"
+src/givenProvider.js:38:    if(global.web3.currentProvider.sendAsync) {
+src/givenProvider.js:39:        global.web3.currentProvider.send = global.web3.currentProvider.sendAsync;
+src/givenProvider.js:40:        delete global.web3.currentProvider.sendAsync;
+
+===> CHANGE THE global line in web3-core-requestmanager/src/givenProvider to 
+
+var global = (function() { return this ? this : typeof self !== 'undefined' ? self : undefined})() || Function("return this")();
+
+all set :)
+
+also take care of similar lines ./node_modules/regenerator-runtime/runtime-module.js 
+
+another thing to set is webpack devtool mode to cheap-module-source-map during development. so that there's no uses of eval statement from webpack AND you can see all the required/imported code snippet in the build code. In there, you might look for anything that shows Function("return this") as well.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 -------------------------
 Redux for chrome extension:

@@ -74,7 +74,7 @@ ctrl + w w to move around split
 31. node.js - npm - package manager
 32. sudo apt install ./***.deb files
 33. uname -r - check kernel version
-34. apt-cache search .. to search installable packages | apt-cache madison .. to check versions available to be installed
+34. apt-cache search .. to search installable packages | apt-cache madison .. to check versions available to be installed OR apt show "software name"
 35. du -hsx * | sort -rh | head -10  => search for top bulk files
 36. ssh-agent - Single Sign-On using SSH. The ssh-agent is a helper program that keeps track of user's identity keys and their passphrases. The agent can then use the keys to log into other servers without having the user type in a password or passphrase again
 To use:

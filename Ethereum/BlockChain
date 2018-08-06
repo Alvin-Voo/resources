@@ -92,6 +92,15 @@ i.e. Changing ANYTHING on the blockchain will require a submission of transactio
 
 https://www.draw.io/#HStephenGrider%2FEthereumCasts%2Fmaster%2Fdiagrams%2F02%2Fdiagrams.xml
 
+--------------------------------------
+MetaMask is like a 'Wallet', just that its a chrome extension.
+MyEtherWallet is a web-based 'Wallet'
+
+A wallet is defined as a piece of software, sometimes called client. software, which at least provides the following basic functions:
+
+Creates new addresses with their corresponding private key
+Tells you how many coins are held by your addresses
+Uses your private keys to sign transactions so that you can spend your coins
 
 ---------------------------------------
 ---------------------------------------
@@ -173,6 +182,11 @@ function _multiply(uint a, uint b) private pure returns (uint) {
 }
 6. Payable - When someone call this function they need to send ether along
 If a function is not marked payable and you try to send Ether to it, the function will reject your transaction
+7. Fallback function - A contract can have exactly have only one unamed function.
+This function cannot have arguments and cannot return anything.
+The function is executed on a call to the contract if none of the other functions match the given function identifier (or if no data was supplied at all)
+Even though the fallback function cannot have arguments, one can still use msg.data to retrieve any payload supplied with the call
+To receive ether for this function, we must mark it as payable
 
 returns keyword is used after view/constant
 
@@ -192,6 +206,12 @@ a setter function or a 'transact' function
 
 a 'transact' function or rather a transaction (anything that changes data in the blockchain) will need miners help to solve the said transaction hash
 
+------------------------------------
+Function calls:
+
+DELETEGATECALL: Delegatecall says “I’m a contract and I’m allowing (delegating) you to do whatever you want to my storage”. If Alice invokes Bob who does delegatecall to Charlie, the msg.sender in the delegatecall is Alice.
+CALLCODE: If callcode was used the msg.sender would be Bob.
+CALL: When contract D does a call on contract E, the code runs in the context of E: the storage of E is used.
 
 ------------------------------------
 Types:
@@ -548,6 +568,9 @@ https://ethereum.stackexchange.com/questions/19380/external-vs-public-best-pract
 
 - external may help to save gas coz the arguments (call data) are not being copied into memory
 
+Functions can be specified as being external, public, internal or private, where the default is PUBLIC. 
+For state variables, external is not possible and the default is INTERNAL.
+
 ------
 Abstract Contracts and Interfaces:
 
@@ -672,7 +695,7 @@ if not using Truffle Suite, need a boilerplate:
 
 ABI - just an array of functions and variables properties for javascript to interface
 
-2. Use mocha and assert (from nodejs)
+2. Use mocha and assert (from nodejs). Other test converage: mocha, chai, sinon.
 
 3. Web3 - to deploy and manipulate contracts with javascript
 
@@ -804,10 +827,17 @@ string cannot be indexed due to their arbitary length.
 
 16. web3.utils._  --> uses underscore.js... very similar to lodash. But lodash is said to be more superior.
 
+17. DO NOT USE _address.call.value ! Security risk!
+
+All three functions call, delegatecall and callcode are very low-level functions and should only be used as a last resort as they break the type-safety of Solidity.
+
+
 -----------------------------------
 Ethereum accounts mnemonic (to contain all accounts.. #1,#2,#3...):
 1.
 exchange slab erupt ankle decade power own trade lyrics volume refuse nasty
+
+k3$h@!$d@b0mb
 
 These 12 words can be used to regenerate the same series of accounts.
 
